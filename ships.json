@@ -1,0 +1,28 @@
+{
+	"ships": [
+		{
+			"name":"Bantam",
+			"tier": 0
+		},
+		{
+			"name":"Blackbird",
+			"tier": 2
+		},
+		{
+			"name":"Drake",
+			"tier": 3
+		},
+		{
+			"name":"Merlin",
+			"tier": 1
+		},
+		{
+			"name":"Raven",
+			"tier": 5
+		},
+		{
+			"name":"Ferox",
+			"tier": 4
+		}
+	]
+}
