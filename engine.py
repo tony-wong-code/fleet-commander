@@ -19,7 +19,17 @@ class Engine():
 
 		self.pool = Pool()
 		self.market = Market(self.pool)
-
-
+		self.market.reinit()
+		self.market_phase = True
 	def render(self):
 		self.screen.blit(self.bg_surf, self.bg_rect)
+		if self.market_phase:
+			self.market.render(self.screen)
+	def update(self, mouse_pos):
+		if self.market.recycle_button_rect.collidepoint(mouse_pos):
+			self.market.recycle_ships()
+		if self.market.upgrade_tier_button_rect.collidepoint(mouse_pos):
+			self.market.upgrade_tier()
+
+		
+

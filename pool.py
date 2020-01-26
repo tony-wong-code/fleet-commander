@@ -27,11 +27,12 @@ class Pool():
 			self.available[t] = self.available[t-1].union(self.available[t])
 
 	def return_ship(self, s):
-		for t in range(self.ship_dict[s].tier + 1):
+		for t in range(self.ship_dict[s].tier, N_TIERS):
 			self.available[t].add(s)
 
 	def get_ship(self, tier):
 		res = random.choice(list(self.available[tier]))
 		for t in range(tier + 1):
-			self.available[t].remove(res)
+			if res in self.available[t]:
+				self.available[t].remove(res)
 		return res

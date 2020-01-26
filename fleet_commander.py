@@ -23,6 +23,8 @@ def main():
                     return
             elif event.type == QUIT: 
                 return
+            elif event.type == MOUSEBUTTONDOWN:
+                game.update(pygame.mouse.get_pos())
 
         game.render()
         pygame.display.flip()
