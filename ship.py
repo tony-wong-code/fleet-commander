@@ -12,4 +12,8 @@ class Ship():
 	def __init__(self, ship_info):
 		self.name = ship_info['name']
 		self.tier = ship_info['tier']
+		self.race = ship_info['race']
+		self.shields = ship_info['shields']
+		self.armor = ship_info['armor']
+		self.hull = ship_info['hull']
 		self.surf, self.rect = load_png(self.name.lower() + '.png', SHIP_ICON_SIZE)

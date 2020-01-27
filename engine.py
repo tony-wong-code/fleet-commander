@@ -21,6 +21,7 @@ class Engine():
 		self.market = Market(self.pool)
 		self.market.reinit()
 		self.market_phase = True
+		pygame.font.init()
 	def render(self):
 		self.screen.blit(self.bg_surf, self.bg_rect)
 		if self.market_phase:

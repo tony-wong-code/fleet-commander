@@ -5,8 +5,10 @@ try:
     import collections
     import pygame
     from constants import *
+    from utilities import *
     from ship import *
     from pool import *
+    from overlay import *
 except(ImportError, err):
     print('Failed to load module: %s' % (err))
     sys.exit(2)
@@ -17,6 +19,7 @@ class Market():
 		self.tier = 0
 		self.ships = []
 		self.hold = False
+		self.overlay = Overlay(self.pool)
 		self.reinit()
 		self.recycle_button_surf, self.recycle_button_rect = load_png('recycle.png', MARKET_ICON_SIZE)
 		self.recycle_button_rect.move_ip(RECYCLE_ICON_POS)
@@ -24,6 +27,7 @@ class Market():
 		self.hold_button_rect.move_ip(HOLD_ICON_POS)
 		self.upgrade_tier_button_surf, self.upgrade_tier_button_rect = load_png('upgrade.png', MARKET_ICON_SIZE)
 		self.upgrade_tier_button_rect.move_ip(UPGRADE_TIER_ICON_POS)
+		
 	def recycle_ships(self):
 		while self.ships:
 			self.pool.return_ship(self.ships.pop())
@@ -52,12 +56,16 @@ class Market():
 		else:
 			self.refill_ships()
 		self.hold = False
-
+		
 	def render(self, screen):
+		mouse_pos = pygame.mouse.get_pos()
 		for i, s in enumerate(self.ships):
 			self.pool.ship_dict[s].rect.x = (i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0]
 			self.pool.ship_dict[s].rect.y = (i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+			if self.pool.ship_dict[s].rect.collidepoint(mouse_pos):
+				self.overlay.render(screen, s)
 			screen.blit(self.pool.ship_dict[s].surf, self.pool.ship_dict[s].rect)
+
 		screen.blit(self.recycle_button_surf, self.recycle_button_rect)
 		screen.blit(self.hold_button_surf, self.hold_button_rect)
 		screen.blit(self.upgrade_tier_button_surf, self.upgrade_tier_button_rect)

@@ -25,7 +25,7 @@ def main():
                 return
             elif event.type == MOUSEBUTTONDOWN:
                 game.update(pygame.mouse.get_pos())
-
+                
         game.render()
         pygame.display.flip()
         clock.tick(30)
