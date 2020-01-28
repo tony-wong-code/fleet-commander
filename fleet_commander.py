@@ -24,8 +24,18 @@ def main():
             elif event.type == QUIT: 
                 return
             elif event.type == MOUSEBUTTONDOWN:
-                game.update(pygame.mouse.get_pos())
-                
+                if event.button == 1:
+                    game.update(pygame.mouse.get_pos())
+            elif event.type == MOUSEBUTTONUP:
+                if event.button == 1:
+                    game.dragging_ship = None
+                    game.dragging_ship_offset = None
+                    game.dragging_rect_correction = [0, 0]
+            elif event.type == MOUSEMOTION:
+                if game.dragging_ship != None:
+                    game.dragging_ship_offset = event.pos
+
+
         game.render()
         pygame.display.flip()
         clock.tick(30)

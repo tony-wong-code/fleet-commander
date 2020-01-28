@@ -57,16 +57,26 @@ class Market():
 			self.refill_ships()
 		self.hold = False
 		
-	def render(self, screen):
+	def render(self, screen, dragging_ship, dragging_ship_offset, dragging_ship_correction):
 		mouse_pos = pygame.mouse.get_pos()
 		for i, s in enumerate(self.ships):
-			self.pool.ship_dict[s].rect.x = (i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0]
-			self.pool.ship_dict[s].rect.y = (i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
-			if self.pool.ship_dict[s].rect.collidepoint(mouse_pos):
-				self.overlay.render(screen, s)
-			screen.blit(self.pool.ship_dict[s].surf, self.pool.ship_dict[s].rect)
+			if s != dragging_ship:
+				self.pool.ship_dict[s].rect.x = (i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0]
+				self.pool.ship_dict[s].rect.y = (i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+				if self.pool.ship_dict[s].rect.collidepoint(mouse_pos):
+					self.overlay.render(screen, s)
+				screen.blit(self.pool.ship_dict[s].surf, self.pool.ship_dict[s].rect)
+			else:
+				if not dragging_ship_offset:
+					self.pool.ship_dict[s].rect.x = (i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0]
+					self.pool.ship_dict[s].rect.y = (i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+				else:
+					self.pool.ship_dict[s].rect.x = dragging_ship_offset[0] - dragging_ship_correction[0]
+					self.pool.ship_dict[s].rect.y = dragging_ship_offset[1] - dragging_ship_correction[1]
+				screen.blit(self.pool.ship_dict[s].surf, self.pool.ship_dict[s].rect)
 
 		screen.blit(self.recycle_button_surf, self.recycle_button_rect)
 		screen.blit(self.hold_button_surf, self.hold_button_rect)
 		screen.blit(self.upgrade_tier_button_surf, self.upgrade_tier_button_rect)
+
 

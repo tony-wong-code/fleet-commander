@@ -21,16 +21,34 @@ class Engine():
 		self.market = Market(self.pool)
 		self.market.reinit()
 		self.market_phase = True
-		pygame.font.init()
+		self.dragging_ship = None
+		self.dragging_ship_offset = None
+		self.dragging_rect_correction = [0, 0]
 	def render(self):
 		self.screen.blit(self.bg_surf, self.bg_rect)
 		if self.market_phase:
-			self.market.render(self.screen)
+			self.market.render(self.screen, self.dragging_ship, self.dragging_ship_offset, self.dragging_rect_correction)
 	def update(self, mouse_pos):
-		if self.market.recycle_button_rect.collidepoint(mouse_pos):
-			self.market.recycle_ships()
-		if self.market.upgrade_tier_button_rect.collidepoint(mouse_pos):
-			self.market.upgrade_tier()
+		if self.market_phase:
+			if self.market.recycle_button_rect.collidepoint(mouse_pos):
+				self.market.recycle_ships()
+			elif self.market.upgrade_tier_button_rect.collidepoint(mouse_pos):
+				self.market.upgrade_tier()
+			else:
+				for i, s in enumerate(self.market.ships):
+					rect = pygame.Rect(
+						(
+							(i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0],
+							(i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+						),
+						(SHIP_ICON_SIZE)
+					)
+					
+					if rect.collidepoint(mouse_pos):
+						self.dragging_ship = s
+						self.dragging_rect_correction[0] = mouse_pos[0] - rect.x
+						self.dragging_rect_correction[1] = mouse_pos[1] - rect.y
+
 
 		
 
