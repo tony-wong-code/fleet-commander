@@ -14,7 +14,8 @@ def load_png(name, resolution):
             image = image.convert()
         else:
             image = image.convert_alpha()
-        image = pygame.transform.scale(image, resolution)
+        res = (int(resolution[0]), int(resolution[1]))
+        image = pygame.transform.scale(image, res)
     except(pygame.error, message):
         print('Failed to load image: ', fullname)
         raise(SystemExit, message)

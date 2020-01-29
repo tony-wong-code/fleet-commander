@@ -36,3 +36,8 @@ class Pool():
 			if res in self.available[t]:
 				self.available[t].remove(res)
 		return res
+
+	def remove_ship(self, s):
+		for t in range(N_TIERS):
+			if s in self.available[t]:
+				self.available[t].remove(s)
