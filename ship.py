@@ -8,8 +8,9 @@ except(ImportError, err):
     print('Failed to load module: %s' % (err))
     sys.exit(2)
 
-class Ship():
+class Ship(pygame.sprite.Sprite):
 	def __init__(self, ship_info):
+		super(Ship, self).__init__()
 		self.name = ship_info['name']
 		self.tier = ship_info['tier']
 		self.race = ship_info['race']

@@ -32,6 +32,8 @@ class Engine():
 		self.dragging_reprocessing_ship_offset = None
 		self.dragging_reprocessing_rect_correction = [0, 0]
 		self.dropping_reprocessing_ship = None
+
+		self.turn = 1
 		
 	def render(self):
 		self.screen.blit(self.bg_surf, self.bg_rect)
@@ -40,24 +42,31 @@ class Engine():
 			self.player.render(self.screen, self.market, self.dragging_reprocessing_ship, self.dragging_reprocessing_ship_offset, self.dragging_reprocessing_rect_correction, self.dropping_reprocessing_ship)
 	def update(self, mouse_pos):
 		if self.market_phase:
-			if self.market.recycle_button_rect.collidepoint(mouse_pos):
+			if self.market.recycle_button_rect.collidepoint(mouse_pos) and self.market.plex >= RECYCLE_COST:
+				self.market.plex = max(self.market.plex - RECYCLE_COST, 0)
 				self.market.recycle_ships()
-			elif self.market.upgrade_tier_button_rect.collidepoint(mouse_pos):
+			elif self.market.upgrade_tier_button_rect.collidepoint(mouse_pos) and self.market.plex >= self.market.current_upgrade_cost:
+				self.market.plex = max(self.market.plex - self.market.current_upgrade_cost, 0)
 				self.market.upgrade_tier()
+			elif self.market.end_turn_rect.collidepoint(mouse_pos):
+				self.market_phase = False
+			elif self.market.hold_button_rect.collidepoint(mouse_pos):
+				self.market.toggle_hold_ships()
 			else:
-				for i, s in enumerate(self.market.ships):
-					rect = pygame.Rect(
-						(
-							(i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0],
-							(i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
-						),
-						(SHIP_ICON_SIZE)
-					)
-					
-					if rect.collidepoint(mouse_pos):
-						self.dragging_ship = s
-						self.dragging_rect_correction[0] = mouse_pos[0] - rect.x
-						self.dragging_rect_correction[1] = mouse_pos[1] - rect.y
+				if self.market.plex >= SHIP_COST:
+					for i, s in enumerate(self.market.ships):
+						rect = pygame.Rect(
+							(
+								(i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0],
+								(i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+							),
+							(SHIP_ICON_SIZE)
+						)
+						
+						if rect.collidepoint(mouse_pos):
+							self.dragging_ship = s
+							self.dragging_rect_correction[0] = mouse_pos[0] - rect.x
+							self.dragging_rect_correction[1] = mouse_pos[1] - rect.y
 
 				for i, s in enumerate(self.player.ships):
 					rect = pygame.Rect(
@@ -72,3 +81,5 @@ class Engine():
 						self.dragging_reprocessing_ship = s
 						self.dragging_reprocessing_rect_correction[0] = mouse_pos[0] - rect.x
 						self.dragging_reprocessing_rect_correction[1] = mouse_pos[1] - rect.y
+		else:
+			return

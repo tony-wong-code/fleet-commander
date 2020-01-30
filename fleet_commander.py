@@ -21,6 +21,14 @@ def main():
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     return
+
+                ### START OF DEBUG
+                if event.key == K_t:
+                    game.player.print_ships()
+                if event.key == K_p:
+                    game.market.plex = min(game.market.plex + 1, 10)
+                ### END OF DEBUG 
+
             elif event.type == QUIT: 
                 return
             elif event.type == MOUSEBUTTONDOWN:
