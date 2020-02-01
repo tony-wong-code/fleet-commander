@@ -20,6 +20,8 @@ with open(path) as csvFile:
 		ship = dict()
 		ship['name'] = row['name']
 		ship['race'] = row['race']
+		ship['ship_class'] = row['ship_class']
+		ship['attack'] = int(row['attack'])
 		ship['tier'] = int(row['tier'])
 		ship['shields'] = int(row['shields'])
 		ship['armor'] = int(row['armor'])

@@ -17,6 +17,10 @@ class Tile(pygame.sprite.Sprite):
 		self.rect.x = pos[0]
 		self.rect.y = pos[1]
 		self.i = i
+		self.order_text = pygame.font.Font(FONT, MEDIUM_FONT_SIZE)
+		self.order_text_surf = self.order_text.render(str(i), ORDER_TEXT_FONT_ANTIALIASING, ORDER_TEXT_FONT_COLOR)
+		self.order_text_rect = self.order_text_surf.get_rect()
+		self.order_text_rect.center = self.rect.center
 
 class Player():
 	def __init__(self, who, pool):
@@ -42,6 +46,7 @@ class Player():
 		for i, s in enumerate(self.ships):
 			screen.blit(self.board[i].surf, self.board[i].rect)
 			if s == None:
+				screen.blit(self.board[i].order_text_surf, self.board[i].order_text_rect)
 				continue
 			if dropping_reprocessing_ship == s:
 				if reprocessing_rect.collidepoint(mouse_pos):

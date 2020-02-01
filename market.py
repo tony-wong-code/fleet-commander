@@ -154,11 +154,13 @@ class Market():
 		screen.blit(tmp_surf, self.recycle_plex_rect)
 		screen.blit(self.hold_button_surf, self.hold_button_rect)
 		screen.blit(self.upgrade_tier_surfs[self.tier], self.upgrade_tier_button_rect)
-		if self.plex >= self.current_upgrade_cost:
-			tmp_surf = self.plex_on_surf
-		else:
-			tmp_surf = self.plex_off_surf
-		screen.blit(tmp_surf, self.upgrade_plex_rect)
+		if self.tier != N_TIERS - 1:
+			screen.blit(self.upgrade_plex_text_surf, self.upgrade_plex_text_rect)
+			if self.plex >= self.current_upgrade_cost:
+				tmp_surf = self.plex_on_surf
+			else:
+				tmp_surf = self.plex_off_surf
+			screen.blit(tmp_surf, self.upgrade_plex_rect)
 		screen.blit(self.reprocess_surf, self.reprocess_rect)
 		screen.blit(self.end_turn_surf, self.end_turn_rect)
 		screen.blit(self.end_turn_text_surf, self.end_turn_text_rect)
@@ -175,6 +177,6 @@ class Market():
 		self.plex_text_rect.y = PLEX_TEXT_POS[1]
 		screen.blit(self.plex_text_surf, self.plex_text_rect)
 
-		screen.blit(self.upgrade_plex_text_surf, self.upgrade_plex_text_rect)
+
 		screen.blit(self.recycle_plex_text_surf, self.recycle_plex_text_rect)
 

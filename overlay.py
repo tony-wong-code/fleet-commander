@@ -21,21 +21,38 @@ class Overlay():
 		self.ship_name = pygame.font.Font(FONT, BIG_FONT_SIZE)
 		self.ship_name_surf = None
 		self.ship_name_rect = None
-		self.ship_race = pygame.font.Font(FONT, MEDIUM_FONT_SIZE)
+		self.ship_race = pygame.font.Font(FONT, SMALL_FONT_SIZE)
 		self.ship_race_surf = None
 		self.ship_race_rect = None
-		self.ship_tier = pygame.font.Font(FONT, MEDIUM_FONT_SIZE)
-		self.ship_tier_surf = None
-		self.ship_tier_rect = None
-		self.ship_shields = pygame.font.Font(FONT, MEDIUM_FONT_SIZE)
+		self.ship_attack = pygame.font.Font(FONT, SMALL_FONT_SIZE)
+		self.ship_attack_surf = None
+		self.ship_attack_rect = None
+		self.ship_shields = pygame.font.Font(FONT, SMALL_FONT_SIZE)
 		self.ship_shields_surf = None
 		self.ship_shields_rect = None
-		self.ship_armor = pygame.font.Font(FONT, MEDIUM_FONT_SIZE)
+		self.ship_armor = pygame.font.Font(FONT, SMALL_FONT_SIZE)
 		self.ship_armor_surf = None
 		self.ship_armor_rect = None
-		self.ship_hull = pygame.font.Font(FONT, MEDIUM_FONT_SIZE)
+		self.ship_hull = pygame.font.Font(FONT, SMALL_FONT_SIZE)
 		self.ship_hull_surf = None
 		self.ship_hull_rect = None
+
+		self.upgrade_tier_surf_1, self.upgrade_tier_rect = load_png('upgrade_1.png', OVERLAY_TIER_ICON_SIZE)
+		self.upgrade_tier_surf_2, self.upgrade_tier_rect = load_png('upgrade_2.png', OVERLAY_TIER_ICON_SIZE)
+		self.upgrade_tier_surf_3, self.upgrade_tier_rect = load_png('upgrade_3.png', OVERLAY_TIER_ICON_SIZE)
+		self.upgrade_tier_surf_4, self.upgrade_tier_rect = load_png('upgrade_4.png', OVERLAY_TIER_ICON_SIZE)
+		self.upgrade_tier_surf_5, self.upgrade_tier_rect = load_png('upgrade_5.png', OVERLAY_TIER_ICON_SIZE)
+		self.upgrade_tier_surf_6, self.upgrade_tier_rect = load_png('upgrade_6.png', OVERLAY_TIER_ICON_SIZE)
+		self.upgrade_tier_surfs = [
+			self.upgrade_tier_surf_1,
+			self.upgrade_tier_surf_2,
+			self.upgrade_tier_surf_3,
+			self.upgrade_tier_surf_4,
+			self.upgrade_tier_surf_5,
+			self.upgrade_tier_surf_6
+		]
+		self.upgrade_tier_rect.x = OVERLAY_SHIP_ICON_POS[0]
+		self.upgrade_tier_rect.y = OVERLAY_SHIP_ICON_POS[1]
 
 	def render(self, screen, s):
 		screen.blit(self.bg, self.bg_rect)
@@ -52,10 +69,10 @@ class Overlay():
 		self.ship_race_rect = self.ship_race_surf.get_rect()
 		self.ship_race_rect.x = OVERLAY_SHIP_RACE_POS[0]
 		self.ship_race_rect.y = OVERLAY_SHIP_RACE_POS[1]
-		self.ship_tier_surf = self.ship_tier.render('tier: ' + str(self.pool.ship_dict[s].tier), OVERLAY_FONT_ANTIALIASING, OVERLAY_FONT_COLOR)
-		self.ship_tier_rect = self.ship_tier_surf.get_rect()
-		self.ship_tier_rect.x = OVERLAY_SHIP_TIER_POS[0]
-		self.ship_tier_rect.y = OVERLAY_SHIP_TIER_POS[1]
+		self.ship_attack_surf = self.ship_attack.render('attack: ' + str(self.pool.ship_dict[s].attack), OVERLAY_FONT_ANTIALIASING, OVERLAY_FONT_COLOR)
+		self.ship_attack_rect = self.ship_attack_surf.get_rect()
+		self.ship_attack_rect.x = OVERLAY_SHIP_ATTACK_POS[0]
+		self.ship_attack_rect.y = OVERLAY_SHIP_ATTACK_POS[1]
 		self.ship_shields_surf = self.ship_shields.render('shields: ' + str(self.pool.ship_dict[s].shields), OVERLAY_FONT_ANTIALIASING, OVERLAY_FONT_COLOR)
 		self.ship_shields_rect = self.ship_shields_surf.get_rect()
 		self.ship_shields_rect.x = OVERLAY_SHIP_SHIELDS_POS[0]
@@ -71,9 +88,10 @@ class Overlay():
 
 		screen.blit(self.ship_name_surf, self.ship_name_rect)
 		screen.blit(self.ship_race_surf, self.ship_race_rect)
-		screen.blit(self.ship_tier_surf, self.ship_tier_rect)
+		screen.blit(self.ship_attack_surf, self.ship_attack_rect)
 		screen.blit(self.ship_shields_surf, self.ship_shields_rect)
 		screen.blit(self.ship_armor_surf, self.ship_armor_rect)
 		screen.blit(self.ship_hull_surf, self.ship_hull_rect)
+		screen.blit(self.upgrade_tier_surfs[self.pool.ship_dict[s].tier], self.upgrade_tier_rect)
 
 

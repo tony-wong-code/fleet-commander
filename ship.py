@@ -13,6 +13,8 @@ class Ship(pygame.sprite.Sprite):
 		super(Ship, self).__init__()
 		self.name = ship_info['name']
 		self.tier = ship_info['tier']
+		self.ship_class = ship_info['ship_class']
+		self.attack = ship_info['attack']
 		self.race = ship_info['race']
 		self.shields = ship_info['shields']
 		self.armor = ship_info['armor']

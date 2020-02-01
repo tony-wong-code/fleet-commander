@@ -45,7 +45,7 @@ class Engine():
 			if self.market.recycle_button_rect.collidepoint(mouse_pos) and self.market.plex >= RECYCLE_COST:
 				self.market.plex = max(self.market.plex - RECYCLE_COST, 0)
 				self.market.recycle_ships()
-			elif self.market.upgrade_tier_button_rect.collidepoint(mouse_pos) and self.market.plex >= self.market.current_upgrade_cost:
+			elif self.market.upgrade_tier_button_rect.collidepoint(mouse_pos) and self.market.plex >= self.market.current_upgrade_cost and self.market.tier != N_TIERS - 1:
 				self.market.plex = max(self.market.plex - self.market.current_upgrade_cost, 0)
 				self.market.upgrade_tier()
 			elif self.market.end_turn_rect.collidepoint(mouse_pos):
