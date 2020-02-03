@@ -20,3 +20,6 @@ class Ship(pygame.sprite.Sprite):
 		self.armor = ship_info['armor']
 		self.hull = ship_info['hull']
 		self.surf, self.rect = load_png(self.name.lower() + '.png', SHIP_ICON_SIZE)
+		self.remaining_shields = self.shields
+		self.remaining_armor = self.armor
+		self.remaining_hull = self.hull

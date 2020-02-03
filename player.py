@@ -11,9 +11,9 @@ except(ImportError, err):
     sys.exit(2)
 
 class Tile(pygame.sprite.Sprite):
-	def __init__(self, pos, i):
+	def __init__(self, name, pos, i):
 		super(Tile, self).__init__()
-		self.surf, self.rect = load_png('battle_tile.png', TILE_SIZE)
+		self.surf, self.rect = load_png(name, TILE_SIZE)
 		self.rect.x = pos[0]
 		self.rect.y = pos[1]
 		self.i = i
@@ -31,7 +31,7 @@ class Player():
 		for i in range(N_SHIPS_PER_PLAYER):
 			x = BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
 			y = BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
-			self.board[i] = Tile((x, y), i)
+			self.board[i] = Tile('battle_tile.png', (x, y), i)
 			self.board_tiles.add(self.board[i])
 		self.station_health = STATION_HEALTH
 		self.ships = [None for _ in range(N_SHIPS_PER_PLAYER)]

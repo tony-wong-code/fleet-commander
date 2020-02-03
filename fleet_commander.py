@@ -13,8 +13,8 @@ except(ImportError, err):
 def main():
     pygame.init()
     screen = pygame.display.set_mode(RESOLUTION)
-    game = Engine(screen)
     clock = pygame.time.Clock()
+    game = Engine(screen)
 
     while True:
         for event in pygame.event.get():
@@ -26,7 +26,7 @@ def main():
                 if event.key == K_t:
                     game.player.print_ships()
                 if event.key == K_p:
-                    game.market.plex = min(game.market.plex + 1, 10)
+                    game.market.plex = 10
                 ### END OF DEBUG 
 
             elif event.type == QUIT: 
@@ -54,7 +54,7 @@ def main():
                     game.dragging_reprocessing_ship_offset = event.pos
 
 
-        game.render()
+        game.render(clock)
         pygame.display.flip()
         clock.tick(30)
         game.dropping_ship = None
