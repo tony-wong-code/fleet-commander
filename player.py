@@ -14,8 +14,7 @@ class Tile(pygame.sprite.Sprite):
 	def __init__(self, name, pos, i):
 		super(Tile, self).__init__()
 		self.surf, self.rect = load_png(name, TILE_SIZE)
-		self.rect.x = pos[0]
-		self.rect.y = pos[1]
+		self.rect.center = pos
 		self.i = i
 		self.order_text = pygame.font.Font(FONT, MEDIUM_FONT_SIZE)
 		self.order_text_surf = self.order_text.render(str(i), ORDER_TEXT_FONT_ANTIALIASING, ORDER_TEXT_FONT_COLOR)
@@ -59,8 +58,12 @@ class Player():
 					if self.ships[tile_index] == None:
 						self.ships[tile_index] = s
 						self.ships[i] = None
-						self.pool.ship_dict[s].rect.x = BOARD_OFFSET[0] + (tile_index % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
-						self.pool.ship_dict[s].rect.y = BOARD_OFFSET[1] + (tile_index // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+						#self.pool.ship_dict[s].rect.x = BOARD_OFFSET[0] + (tile_index % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
+						#self.pool.ship_dict[s].rect.y = BOARD_OFFSET[1] + (tile_index // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+						self.pool.ship_dict[s].rect.center = (
+							BOARD_OFFSET[0] + (tile_index % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0]),
+							BOARD_OFFSET[1] + (tile_index // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+						)
 						ignore_s.add(s)
 					# dragging a player ship onto another player ship
 					else:
@@ -68,20 +71,40 @@ class Player():
 						ignore_s.add(s)
 						ignore_s.add(s2)
 						self.ships[tile_index], self.ships[i] = self.ships[i], self.ships[tile_index]
-						self.pool.ship_dict[s].rect.x = BOARD_OFFSET[0] + (tile_index % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
-						self.pool.ship_dict[s].rect.y = BOARD_OFFSET[1] + (tile_index // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
-						self.pool.ship_dict[s2].rect.x = BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
-						self.pool.ship_dict[s2].rect.y = BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+						#self.pool.ship_dict[s].rect.x = BOARD_OFFSET[0] + (tile_index % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
+						#self.pool.ship_dict[s].rect.y = BOARD_OFFSET[1] + (tile_index // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+						self.pool.ship_dict[s].rect.center = (
+							BOARD_OFFSET[0] + (tile_index % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0]),
+							BOARD_OFFSET[1] + (tile_index // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+						)
+						#self.pool.ship_dict[s2].rect.x = BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
+						#self.pool.ship_dict[s2].rect.y = BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+						self.pool.ship_dict[s2].rect.center = (
+							BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0]),
+							BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+						)
 				else:
-					self.pool.ship_dict[s].rect.x = BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
-					self.pool.ship_dict[s].rect.y = BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+					#self.pool.ship_dict[s].rect.x = BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
+					#self.pool.ship_dict[s].rect.y = BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+					self.pool.ship_dict[s].rect.center = (
+						BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0]),
+						BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+					)
 			if s != dragging_reprocessing_ship and s not in ignore_s:
 				screen.blit(self.pool.ship_dict[self.ships[i]].surf, self.pool.ship_dict[self.ships[i]].rect)
 			elif s not in ignore_s:
 				if not dragging_reprocessing_ship_offset:
-					self.pool.ship_dict[s].rect.x = BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
-					self.pool.ship_dict[s].rect.y = BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+					#self.pool.ship_dict[s].rect.x = BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0])
+					#self.pool.ship_dict[s].rect.y = BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+					self.pool.ship_dict[s].rect.center = (
+						BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0]),
+						BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+					)
 				else:
-					self.pool.ship_dict[s].rect.x = dragging_reprocessing_ship_offset[0] - dragging_reprocessing_ship_correction[0]
-					self.pool.ship_dict[s].rect.y = dragging_reprocessing_ship_offset[1] - dragging_reprocessing_ship_correction[1]
+					#self.pool.ship_dict[s].rect.x = dragging_reprocessing_ship_offset[0] - dragging_reprocessing_ship_correction[0]
+					#self.pool.ship_dict[s].rect.y = dragging_reprocessing_ship_offset[1] - dragging_reprocessing_ship_correction[1]
+					self.pool.ship_dict[s].rect.center = (
+						dragging_reprocessing_ship_offset[0] - dragging_reprocessing_ship_correction[0],
+						dragging_reprocessing_ship_offset[1] - dragging_reprocessing_ship_correction[1]
+					)
 				screen.blit(self.pool.ship_dict[s].surf, self.pool.ship_dict[s].rect)

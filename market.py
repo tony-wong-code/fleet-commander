@@ -122,14 +122,19 @@ class Market():
 			if dropping_ship == s:
 				for j, tile in enumerate(self.player.board):
 					if tile.rect.collidepoint(mouse_pos):
-						self.pool.ship_dict[s].rect.x = tile.rect.x
-						self.pool.ship_dict[s].rect.y = tile.rect.y
+						#self.pool.ship_dict[s].rect.x = tile.rect.x
+						#self.pool.ship_dict[s].rect.y = tile.rect.y
+						self.pool.ship_dict[s].rect.center = tile.rect.center
 						if self.player.ships[j] == None:
 							self.player.ships[j] = self.buy_ship(s)
 							ignore_s = s
 			if s != dragging_ship and s != ignore_s:
-				self.pool.ship_dict[s].rect.x = (i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0]
-				self.pool.ship_dict[s].rect.y = (i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+				#self.pool.ship_dict[s].rect.x = (i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0]
+				#self.pool.ship_dict[s].rect.y = (i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+				self.pool.ship_dict[s].rect.center = (
+					(i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0],
+					(i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+				)
 				if self.pool.ship_dict[s].rect.collidepoint(mouse_pos):
 					self.overlay.render(screen, s)
 				screen.blit(self.pool.ship_dict[s].surf, self.pool.ship_dict[s].rect)
@@ -137,11 +142,19 @@ class Market():
 					screen.blit(self.hold_button_surf, self.pool.ship_dict[s].rect)
 			elif s != ignore_s:
 				if not dragging_ship_offset:
-					self.pool.ship_dict[s].rect.x = (i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0]
-					self.pool.ship_dict[s].rect.y = (i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+					#self.pool.ship_dict[s].rect.x = (i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0]
+					#self.pool.ship_dict[s].rect.y = (i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+					self.pool.ship_dict[s].rect.center = (
+						(i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0],
+						(i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+					)
 				else:
-					self.pool.ship_dict[s].rect.x = dragging_ship_offset[0] - dragging_ship_correction[0]
-					self.pool.ship_dict[s].rect.y = dragging_ship_offset[1] - dragging_ship_correction[1]
+					#self.pool.ship_dict[s].rect.x = dragging_ship_offset[0] - dragging_ship_correction[0]
+					#self.pool.ship_dict[s].rect.y = dragging_ship_offset[1] - dragging_ship_correction[1]
+					self.pool.ship_dict[s].rect.center = (
+						dragging_ship_offset[0] - dragging_ship_correction[0],
+						dragging_ship_offset[1] - dragging_ship_correction[1]
+					)
 				screen.blit(self.pool.ship_dict[s].surf, self.pool.ship_dict[s].rect)
 
 

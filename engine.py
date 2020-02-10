@@ -18,8 +18,8 @@ except(ImportError, err):
 class Engine():
 	def __init__(self, screen):
 		self.screen = screen
-		pygame.display.set_caption('F L E E T   C O M M A N D E R')
-		self.bg_surf, self.bg_rect = load_png('background.png', RESOLUTION)
+		
+		self.bg_surf, self.bg_rect = load_png('battle_bg.png', RESOLUTION)
 
 		self.pool = Pool()
 		self.player = Player(HUMAN, self.pool)
@@ -67,11 +67,15 @@ class Engine():
 							),
 							(SHIP_ICON_SIZE)
 						)
+						rect.center = (
+							(i % N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[0] + SHIP_ICON_PADDING[0]) + MARKET_OFFSET[0],
+							(i // N_MARKET_SHIPS_PER_ROW)*(SHIP_ICON_SIZE[1] + SHIP_ICON_PADDING[1]) + MARKET_OFFSET[1]
+						)
 						
 						if rect.collidepoint(mouse_pos):
 							self.dragging_ship = s
-							self.dragging_rect_correction[0] = mouse_pos[0] - rect.x
-							self.dragging_rect_correction[1] = mouse_pos[1] - rect.y
+							self.dragging_rect_correction[0] = mouse_pos[0] - rect.center[0]
+							self.dragging_rect_correction[1] = mouse_pos[1] - rect.center[1]
 
 				for i, s in enumerate(self.player.ships):
 					rect = pygame.Rect(
@@ -81,11 +85,14 @@ class Engine():
 						),
 						(TILE_SIZE)
 					)
-
+					rect.center = (
+						BOARD_OFFSET[0] + (i % BOARD_SIZE[0])*(TILE_SIZE[0] + TILE_PADDING[0]),
+						BOARD_OFFSET[1] + (i // BOARD_SIZE[0])*(TILE_SIZE[1] + TILE_PADDING[1])
+					)
 					if rect.collidepoint(mouse_pos):
 						self.dragging_reprocessing_ship = s
-						self.dragging_reprocessing_rect_correction[0] = mouse_pos[0] - rect.x
-						self.dragging_reprocessing_rect_correction[1] = mouse_pos[1] - rect.y
+						self.dragging_reprocessing_rect_correction[0] = mouse_pos[0] - rect.center[0]
+						self.dragging_reprocessing_rect_correction[1] = mouse_pos[1] - rect.center[1]
 		else:
 			self.battle(self.player, self.player)
 
@@ -203,5 +210,7 @@ class Engine():
 					self.draw_ship_status(s, s.rect.center)
 					self.screen.blit(s.surf, s.rect)
 			pygame.display.flip()
-			pygame.time.delay(10000)
-			sys.exit(2)
+			for e in pygame.event.get():
+				if e.type == KEYDOWN:
+					if e.key == K_ESCAPE:
+						sys.exit(2)

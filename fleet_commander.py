@@ -6,6 +6,8 @@ try:
     from constants import *
     from utilities import *
     from engine import *
+    from menu import *
+    from game import *
 except(ImportError, err):
     print('Failed to load module: %s' % (err))
     sys.exit(2)
@@ -14,9 +16,19 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(RESOLUTION)
     clock = pygame.time.Clock()
-    game = Engine(screen)
-
+    
+    game_state = MENU
+    menu = Menu(screen, clock)
+    #game = Engine(screen)
+    game = Game(screen, clock)
+    pygame.display.set_caption('Fleet Commander')
     while True:
+        while game_state == MENU:
+            game_state = menu.render()
+
+        while game_state == GAME:
+            game_state = game.render()
+
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
