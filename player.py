@@ -2,6 +2,7 @@ try:
     import sys
     import pygame
     from pygame.locals import *
+    import random
 
     from constants import *
     from utilities import *
@@ -22,8 +23,10 @@ class Tile(pygame.sprite.Sprite):
 		self.order_text_rect.center = self.rect.center
 
 class Player():
-	def __init__(self, who, pool):
+	def __init__(self, who, pool, surf=None, rect=None):
 		self.who = who
+		self.surf = surf
+		self.rect = rect
 		self.pool = pool
 		self.board = [None for _ in range(N_SHIPS_PER_PLAYER)]
 		self.board_tiles = pygame.sprite.Group()

@@ -15,6 +15,9 @@ class Commander(pygame.sprite.Sprite):
 		self.name = commander_info['name']
 		self.race = commander_info['race']
 		self.bloodline = commander_info['bloodline']
+		self.image = commander_info['image']
 		self.surf, self.rect = load_png(commander_info['image'], COMMANDER_SELECT_SIZE)
+		self.commander_overlay_surf, self.commander_overlay_rect = load_png(commander_info['image'], COMMANDER_OVERLAY_ICON_SIZE)
+		self.commander_overlay_rect.center = COMMANDER_OVERLAY_ICON_POS
 		self.bonus_description = commander_info['bonus']
 		self.penalty_description = commander_info['penalty']
