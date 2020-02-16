@@ -9,6 +9,7 @@ try:
     import pygame.gfxdraw
 
 
+
     from copy import copy
     from constants import *
     from utilities import *
@@ -86,37 +87,40 @@ class Game():
 
 		
 
-	def draw_commander_overlay(self, cmdr, ranking):
-		bg_rect = pygame.Rect((0, 0), COMMANDER_OVERLAY_SIZE)
-		bg_rect.center = COMMANDER_OVERLAY_POS
-		bg_surf = pygame.Surface(COMMANDER_OVERLAY_SIZE)
-		bg_surf.fill(GRAY)
-		bg_surf.set_alpha(100)
-		txt = COMMANDER_OVERLAY_TEXT_RANKING[ranking]
-		if cmdr.who == self.commander:
-			txt = ''.join([txt, ' (You)'])
-		elif cmdr.who == self.next_opponent:
-			txt = ''.join([txt, ' (Next Opponent)'])
-		cmdr_ranking_surf = self.commander_font_small.render(txt, AA, WHITE)
-		cmdr_ranking_rect = cmdr_ranking_surf.get_rect()
-		cmdr_ranking_rect.center = COMMANDER_OVERLAY_TEXT_POS_0
-		cmdr_name_surf = self.commander_font_small.render(self.commander_dict[cmdr.who].name, AA, WHITE)
-		cmdr_name_rect = cmdr_name_surf.get_rect()
-		cmdr_name_rect.center = COMMANDER_OVERLAY_TEXT_POS_1
-		cmdr_bonus_surf = self.commander_font_mini.render(self.commander_dict[cmdr.who].bonus_description, AA, WHITE)
-		cmdr_bonus_rect = cmdr_bonus_surf.get_rect()
-		cmdr_bonus_rect.center = COMMANDER_OVERLAY_TEXT_POS_2
-		cmdr_penalty_surf = self.commander_font_mini.render(self.commander_dict[cmdr.who].penalty_description, AA, WHITE)
-		cmdr_penalty_rect = cmdr_penalty_surf.get_rect()
-		cmdr_penalty_rect.center = COMMANDER_OVERLAY_TEXT_POS_3
+	def draw_commander_overlay(self, mouse_pos):
+		for ranking, cmdr in enumerate(self.players):
+			if cmdr.rect.collidepoint(mouse_pos):
+				bg_rect = pygame.Rect((0, 0), COMMANDER_OVERLAY_SIZE)
+				bg_rect.center = COMMANDER_OVERLAY_POS
+				bg_surf = pygame.Surface(COMMANDER_OVERLAY_SIZE)
+				bg_surf.fill(GRAY)
+				bg_surf.set_alpha(240)
+				txt = COMMANDER_OVERLAY_TEXT_RANKING[ranking]
+				txt = ''.join([txt, ' [', str(cmdr.station_health), ']'])
+				if cmdr.who == self.commander:
+					txt = ''.join([txt, ' (You)'])
+				elif cmdr.who == self.next_opponent:
+					txt = ''.join([txt, ' (Next Opponent)'])
+				cmdr_ranking_surf = self.commander_font_small.render(txt, AA, WHITE)
+				cmdr_ranking_rect = cmdr_ranking_surf.get_rect()
+				cmdr_ranking_rect.center = COMMANDER_OVERLAY_TEXT_POS_0
+				cmdr_name_surf = self.commander_font_small.render(self.commander_dict[cmdr.who].name, AA, WHITE)
+				cmdr_name_rect = cmdr_name_surf.get_rect()
+				cmdr_name_rect.center = COMMANDER_OVERLAY_TEXT_POS_1
+				cmdr_bonus_surf = self.commander_font_mini.render(self.commander_dict[cmdr.who].bonus_description, AA, WHITE)
+				cmdr_bonus_rect = cmdr_bonus_surf.get_rect()
+				cmdr_bonus_rect.center = COMMANDER_OVERLAY_TEXT_POS_2
+				cmdr_penalty_surf = self.commander_font_mini.render(self.commander_dict[cmdr.who].penalty_description, AA, WHITE)
+				cmdr_penalty_rect = cmdr_penalty_surf.get_rect()
+				cmdr_penalty_rect.center = COMMANDER_OVERLAY_TEXT_POS_3
 
 
-		self.screen.blit(bg_surf, bg_rect)
-		self.screen.blit(self.commander_dict[cmdr.who].commander_overlay_surf, self.commander_dict[cmdr.who].commander_overlay_rect)
-		self.screen.blit(cmdr_name_surf, cmdr_name_rect)
-		self.screen.blit(cmdr_bonus_surf, cmdr_bonus_rect)
-		self.screen.blit(cmdr_penalty_surf, cmdr_penalty_rect)
-		self.screen.blit(cmdr_ranking_surf, cmdr_ranking_rect)
+				self.screen.blit(bg_surf, bg_rect)
+				self.screen.blit(self.commander_dict[cmdr.who].commander_overlay_surf, self.commander_dict[cmdr.who].commander_overlay_rect)
+				self.screen.blit(cmdr_name_surf, cmdr_name_rect)
+				self.screen.blit(cmdr_bonus_surf, cmdr_bonus_rect)
+				self.screen.blit(cmdr_penalty_surf, cmdr_penalty_rect)
+				self.screen.blit(cmdr_ranking_surf, cmdr_ranking_rect)
 
 	def find_next_opponent(self):
 		self.next_opponent = random.choice(self.opponents)
@@ -131,7 +135,38 @@ class Game():
 		self.players.sort(key=operator.attrgetter('station_health'), reverse=True)
 		self.find_next_opponent()
 
-	def draw_player_ranking(self, mouse_pos):
+	def draw_market(self, mouse_pos):
+		rnge = 0
+		for i in range(N_MARKET_SHIPS_PER_TIER[rnge]):
+			r = pygame.Rect((0, 0), (100, 100))
+			r.center = ((i + 1)*MARKET_SHIP_ICON_PADDING + int((i + 0.5)*MARKET_SHIP_ICON_SIZE[0]) + MARKET_SHIP_ICON_OFFSET[rnge], RESOLUTION[1]//4)
+			s = pygame.Surface(r.size)
+			s.fill(YELLOW)
+			s.set_alpha(100)
+			self.screen.blit(s, r)
+		for i in range(N_SHIPS_PER_PLAYER):
+			self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i])
+			s = self.commander_font_medium.render(str(i + 1), AA, WHITE)
+			r = s.get_rect()
+			r.center = BATTLE_HEXAGON_POS_PLAYER_1[i]
+			self.screen.blit(s, r)
+
+
+	def draw_hexagon(self, pos):
+		x = pos[0]
+		y = pos[1]
+		pygame.draw.aalines(
+			self.screen,
+			TEAL,
+			True,
+			[
+		        (x + BATTLE_HEXAGON_RADIUS * math.cos(2 * math.pi * i / 6), y + BATTLE_HEXAGON_RADIUS * math.sin(2 * math.pi * i / 6))
+		        for i in range(6)
+    		],
+    		1
+    	)
+
+	def draw_player_ranking(self):
 		for i, p in enumerate(self.players):
 			r = pygame.Rect(COMMANDER_RANKING_HEALTH_POS[i], COMMANDER_RANKING_HEALTH_SIZE)
 			s = pygame.Surface(r.size)
@@ -156,8 +191,7 @@ class Game():
 			self.screen.blit(s, r)
 			self.screen.blit(s2, r2)
 			self.screen.blit(p.surf, p.rect)
-			if p.rect.collidepoint(mouse_pos):
-				self.draw_commander_overlay(p, i)
+			
 
 	def render(self):
 		if self.render_state == COMMANDER_SELECT:
@@ -208,7 +242,10 @@ class Game():
 	def render_market(self):
 		self.screen.blit(self.market_bg_surf, self.market_bg_rect)
 		mouse_pos = pygame.mouse.get_pos()
-		self.draw_player_ranking(mouse_pos)
+		self.draw_player_ranking()
+		self.draw_market(mouse_pos)
+
+		self.draw_commander_overlay(mouse_pos)
 
 		for event in pygame.event.get():
 			if event.type == KEYDOWN:
