@@ -37,6 +37,9 @@ class Player():
 			self.board_tiles.add(self.board[i])
 		self.station_health = STATION_HEALTH
 		self.ships = [None for _ in range(N_SHIPS_PER_PLAYER)]
+		self.tier = 0
+		self.ships_in_market = []
+		self.hold_ships = False
 
 	def print_ships(self):
 		print(self.ships)

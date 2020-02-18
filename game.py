@@ -84,6 +84,12 @@ class Game():
 		self.pool = Pool()
 		self.opponents = []
 		self.next_opponent = None
+		self.players_dict = collections.defaultdict()
+		self.you = None
+
+		self.ship_overlay_font_medium = pygame.font.Font(FONT, BIG_FONT_SIZE)
+		self.ship_overlay_font_small = pygame.font.Font(FONT, SMALL_FONT_SIZE)
+		self.ship_overlay_font_mini = pygame.font.Font(FONT, MINI_FONT_SIZE)
 
 		
 
@@ -122,6 +128,39 @@ class Game():
 				self.screen.blit(cmdr_penalty_surf, cmdr_penalty_rect)
 				self.screen.blit(cmdr_ranking_surf, cmdr_ranking_rect)
 
+	def draw_ship_overlay(self, mouse_pos):
+		for s in self.you.ships_in_market:
+			if s is not None and self.pool.ship_dict[s].icon_rect.collidepoint(mouse_pos):
+				bg_rect = pygame.Rect((0, 0), SHIP_OVERLAY_SIZE)
+				bg_rect.center = SHIP_OVERLAY_POS
+				bg_surf = pygame.Surface(SHIP_OVERLAY_SIZE)
+				bg_surf.fill(GRAY)
+				bg_surf.set_alpha(240)
+				self.screen.blit(bg_surf, bg_rect)
+
+				s_surf = self.pool.ship_dict[s].overlay_surf
+				s_rect = self.pool.ship_dict[s].overlay_rect
+				s_rect.center = SHIP_ICON_OVERLAY_POS
+				self.screen.blit(s_surf, s_rect)
+
+				s_name_surf = self.ship_overlay_font_medium.render(self.pool.ship_dict[s].name, AA, WHITE)
+				s_name_rect = s_name_surf.get_rect()
+				s_name_rect.left, s_name_rect.top = SHIP_OVERLAY_NAME_POS
+				self.screen.blit(s_name_surf, s_name_rect)
+
+				s_race_surf = self.ship_overlay_font_small.render(RACE_NAMES[self.pool.ship_dict[s].race], AA, WHITE)
+				s_race_rect = s_race_surf.get_rect()
+				s_race_rect.left, s_race_rect.top = SHIP_OVERLAY_RACE_POS
+				self.screen.blit(s_race_surf, s_race_rect)
+
+				s_role_surf = self.ship_overlay_font_mini.render(self.pool.ship_dict[s].role, AA, WHITE)
+				s_role_rect = s_role_surf.get_rect()
+				s_role_rect.left, s_role_rect.top = SHIP_OVERLAY_ROLE_POS
+				self.screen.blit(s_role_surf, s_role_rect)
+				
+				
+				
+
 	def find_next_opponent(self):
 		self.next_opponent = random.choice(self.opponents)
 
@@ -131,19 +170,28 @@ class Game():
 		plyrs.append(self.commander)
 		for p in plyrs:
 			s, r = load_png(self.commander_dict[p].image, COMMANDER_RANKING_ICON_SIZE)
-			self.players.append(Player(p, self.pool, s, r))
+			self.players_dict[p] = Player(p, self.pool, s, r)
+			self.players.append(self.players_dict[p])
 		self.players.sort(key=operator.attrgetter('station_health'), reverse=True)
+		self.you = self.players_dict[self.commander]
 		self.find_next_opponent()
 
+	def init_player_market(self):
+		if self.you.hold_ships == False:
+			self.you.ships_in_market = []
+		self.you.hold_ships = False
+		while len(self.you.ships_in_market) < N_MARKET_SHIPS_PER_TIER[self.you.tier]:
+			self.you.ships_in_market.append(self.pool.get_ship(self.you.tier))
+
 	def draw_market(self, mouse_pos):
-		rnge = 0
-		for i in range(N_MARKET_SHIPS_PER_TIER[rnge]):
-			r = pygame.Rect((0, 0), (100, 100))
-			r.center = ((i + 1)*MARKET_SHIP_ICON_PADDING + int((i + 0.5)*MARKET_SHIP_ICON_SIZE[0]) + MARKET_SHIP_ICON_OFFSET[rnge], RESOLUTION[1]//4)
-			s = pygame.Surface(r.size)
-			s.fill(YELLOW)
-			s.set_alpha(100)
-			self.screen.blit(s, r)
+		for i, s in enumerate(self.you.ships_in_market):
+			if s is None:
+				pos = ((i + 1)*MARKET_SHIP_ICON_PADDING + int((i + 0.5)*MARKET_SHIP_ICON_SIZE[0]) + MARKET_SHIP_ICON_OFFSET[self.you.tier], RESOLUTION[1]//4)
+				self.draw_hexagon(pos, ORANGE)
+			else:
+				r = self.pool.ship_dict[s].icon_rect
+				r.center = ((i + 1)*MARKET_SHIP_ICON_PADDING + int((i + 0.5)*MARKET_SHIP_ICON_SIZE[0]) + MARKET_SHIP_ICON_OFFSET[self.you.tier], RESOLUTION[1]//4)
+				self.screen.blit(self.pool.ship_dict[s].icon_surf, r)
 		for i in range(N_SHIPS_PER_PLAYER):
 			self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i])
 			s = self.commander_font_medium.render(str(i + 1), AA, WHITE)
@@ -151,13 +199,12 @@ class Game():
 			r.center = BATTLE_HEXAGON_POS_PLAYER_1[i]
 			self.screen.blit(s, r)
 
-
-	def draw_hexagon(self, pos):
+	def draw_hexagon(self, pos, color=TEAL):
 		x = pos[0]
 		y = pos[1]
 		pygame.draw.aalines(
 			self.screen,
-			TEAL,
+			color,
 			True,
 			[
 		        (x + BATTLE_HEXAGON_RADIUS * math.cos(2 * math.pi * i / 6), y + BATTLE_HEXAGON_RADIUS * math.sin(2 * math.pi * i / 6))
@@ -228,10 +275,12 @@ class Game():
 				if event.key == K_ESCAPE:
 					sys.exit(0)
 			elif event.type == MOUSEBUTTONDOWN:
+				# START OF MARKET PHASE
 				if event.button == 1 and self.commander != None:
 					self.available_commanders.pop(self.commander)
 					self.render_state = MARKET
 					self.init_players()
+					self.init_player_market()
 			elif event.type == QUIT:
 				sys.exit(0)
 
@@ -246,6 +295,7 @@ class Game():
 		self.draw_market(mouse_pos)
 
 		self.draw_commander_overlay(mouse_pos)
+		self.draw_ship_overlay(mouse_pos)
 
 		for event in pygame.event.get():
 			if event.type == KEYDOWN:
