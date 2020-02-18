@@ -45,6 +45,28 @@ class Ship(pygame.sprite.Sprite):
 		self.evasion = ship_info['evasion']
 		self.ship_score = ship_info['ship_score']
 
+		self.abilities = []
+		if self.auras != 0:
+			self.abilities.append(A_AURA)
+		if self.warp_fields != 0:
+			self.abilities.append(A_WARP_FIELD)
+		if self.cap_transfers != 0:
+			self.abilities.append(A_CAP_TRANSFER)
+		if self.ecm != 0:
+			self.abilities.append(A_ECM)
+		if self.webs_scrams != 0:
+			self.abilities.append(A_TACKLE)
+		if self.neuts != 0:
+			self.abilities.append(A_NEUT)
+		if self.sensor_boosters != 0:
+			self.abilities.append(A_SENSOR_BOOSTER)
+		if self.damps != 0:
+			self.abilities.append(A_DAMP)
+		if self.painters != 0:
+			self.abilities.append(A_PAINTER)
+		if self.track_guide_disrupts != 0:
+			self.abilities.append(A_DISRUPTOR)
+
 		self.image_path = 'ships/' + self.name.lower() + '.png'
 		self.icon_surf, self.icon_rect = load_png(self.image_path, SHIP_ICON_SIZE)
 		self.overlay_surf, self.overlay_rect = load_png(self.image_path, SHIP_ICON_OVERLAY_SIZE)

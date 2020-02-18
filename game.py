@@ -91,7 +91,57 @@ class Game():
 		self.ship_overlay_font_small = pygame.font.Font(FONT, SMALL_FONT_SIZE)
 		self.ship_overlay_font_mini = pygame.font.Font(FONT, MINI_FONT_SIZE)
 
-		
+		self.ship_overlay_ability_surfs = collections.defaultdict()
+		self.ship_overlay_ability_aura_surf, self.ship_overlay_ability_aura_rect = load_png('overlay_icons/aura.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_AURA_POS)
+		self.ship_overlay_ability_surfs[A_AURA] = self.ship_overlay_ability_aura_surf
+		self.ship_overlay_ability_warp_field_surf, self.ship_overlay_ability_warp_field_rect = load_png('overlay_icons/warp_field.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_WARP_FIELD_POS)
+		self.ship_overlay_ability_surfs[A_WARP_FIELD] = self.ship_overlay_ability_warp_field_surf
+		self.ship_overlay_ability_cap_transfer_surf, self.ship_overlay_ability_cap_transfer_rect = load_png('overlay_icons/cap_transfer.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_CAP_TRANSFER_POS)
+		self.ship_overlay_ability_surfs[A_CAP_TRANSFER] = self.ship_overlay_ability_cap_transfer_surf
+		self.ship_overlay_ability_ecm_surf, self.ship_overlay_ability_ecm_rect = load_png('overlay_icons/ecm.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_ECM_POS)
+		self.ship_overlay_ability_surfs[A_ECM] = self.ship_overlay_ability_ecm_surf
+		self.ship_overlay_ability_tackle_surf, self.ship_overlay_ability_tackle_rect = load_png('overlay_icons/tackle.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_TACKLE_POS)
+		self.ship_overlay_ability_surfs[A_TACKLE] = self.ship_overlay_ability_tackle_surf
+		self.ship_overlay_ability_neut_surf, self.ship_overlay_ability_neut_rect = load_png('overlay_icons/neut.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_NEUT_POS)
+		self.ship_overlay_ability_surfs[A_NEUT] = self.ship_overlay_ability_neut_surf
+		self.ship_overlay_ability_sensor_booster_surf, self.ship_overlay_ability_sensor_booster_rect = load_png('overlay_icons/sensor_booster.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_SENSOR_BOOSTER_POS)
+		self.ship_overlay_ability_surfs[A_SENSOR_BOOSTER] = self.ship_overlay_ability_sensor_booster_surf
+		self.ship_overlay_ability_damp_surf, self.ship_overlay_ability_damp_rect = load_png('overlay_icons/damp.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_DAMP_POS)
+		self.ship_overlay_ability_surfs[A_DAMP] = self.ship_overlay_ability_damp_surf
+		self.ship_overlay_ability_painter_surf, self.ship_overlay_ability_painter_rect = load_png('overlay_icons/painter.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_PAINTER_POS)
+		self.ship_overlay_ability_surfs[A_PAINTER] = self.ship_overlay_ability_painter_surf
+		self.ship_overlay_ability_disruptor_surf, self.ship_overlay_ability_disruptor_rect = load_png('overlay_icons/disruptor.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_DISRUPTOR_POS)
+		self.ship_overlay_ability_surfs[A_DISRUPTOR] = self.ship_overlay_ability_disruptor_surf
+
+		self.ship_overlay_weapon_surfs = collections.defaultdict()
+		self.ship_overlay_weapon_energy_surf, self.ship_overlay_weapon_type_rect = load_png('overlay_icons/energy.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_WEAPON_POS)
+		self.ship_overlay_weapon_surfs[W_ENERGY] = self.ship_overlay_weapon_energy_surf
+		self.ship_overlay_weapon_missile_surf, self.ship_overlay_weapon_type_rect = load_png('overlay_icons/missile.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_WEAPON_POS)
+		self.ship_overlay_weapon_surfs[W_MISSILE] = self.ship_overlay_weapon_missile_surf
+		self.ship_overlay_weapon_hybrid_surf, self.ship_overlay_weapon_type_rect = load_png('overlay_icons/hybrid.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_WEAPON_POS)
+		self.ship_overlay_weapon_surfs[W_HYBRID] = self.ship_overlay_weapon_hybrid_surf
+		self.ship_overlay_weapon_projectile_surf, self.ship_overlay_weapon_type_rect = load_png('overlay_icons/projectile.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_WEAPON_POS)
+		self.ship_overlay_weapon_surfs[W_PROJECTILE] = self.ship_overlay_weapon_projectile_surf
+		self.ship_overlay_weapon_smartbomb_surf, self.ship_overlay_weapon_type_rect = load_png('overlay_icons/smartbomb.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_WEAPON_POS)
+		self.ship_overlay_weapon_surfs[W_SMARTBOMB] = self.ship_overlay_weapon_smartbomb_surf
+		self.ship_overlay_weapon_none_surf, self.ship_overlay_weapon_none_rect = load_png('overlay_icons/none.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_WEAPON_POS)
+		self.ship_overlay_weapon_surfs[W_NONE] = self.ship_overlay_weapon_none_surf
+
+		self.ship_overlay_drones_surf, self.ship_overlay_drones_rect = load_png('overlay_icons/drones.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_DRONES_POS)
+		self.ship_overlay_total_dps_surf, self.ship_overlay_total_dps_rect = load_png('overlay_icons/total_dps.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_TOTAL_DPS_POS)
+		self.ship_overlay_volley_surf, self.ship_overlay_volley_rect = load_png('overlay_icons/volley.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_VOLLEY_POS)
+		self.ship_overlay_salvo_period_surf, self.ship_overlay_salvo_period_rect = load_png('overlay_icons/salvo_period.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_SALVO_PERIOD_POS)
+		self.ship_overlay_shield_surf, self.ship_overlay_shield_rect = load_png('overlay_icons/shield.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_SHIELD_POS)
+		self.ship_overlay_armor_surf, self.ship_overlay_armor_rect = load_png('overlay_icons/armor.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_ARMOR_POS)
+		self.ship_overlay_hull_surf, self.ship_overlay_hull_rect = load_png('overlay_icons/hull.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_HULL_POS)
+		self.ship_overlay_total_hp_surf, self.ship_overlay_total_hp_rect = load_png('overlay_icons/total_hp.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_TOTAL_HP_POS)
+		self.ship_overlay_shield_recharge_surf, self.ship_overlay_shield_recharge_rect = load_png('overlay_icons/shield_recharge.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_SHIELD_RECHARGE_POS)
+		self.ship_overlay_armor_recharge_surf, self.ship_overlay_armor_recharge_rect = load_png('overlay_icons/armor_recharge.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_ARMOR_RECHARGE_POS)
+		self.ship_overlay_total_recharge_surf, self.ship_overlay_total_recharge_rect = load_png('overlay_icons/total_recharge.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_TOTAL_RECHARGE_POS)
+		self.ship_overlay_remote_shield_surf, self.ship_overlay_remote_shield_rect = load_png('overlay_icons/remote_shield.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_REMOTE_SHIELD_POS)
+		self.ship_overlay_remote_armor_surf, self.ship_overlay_remote_armor_rect = load_png('overlay_icons/remote_armor.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_REMOTE_ARMOR_POS)
+		self.ship_overlay_total_remote_surf, self.ship_overlay_total_remote_rect = load_png('overlay_icons/total_remote_rep.png', SHIP_OVERLAY_SMALL_ICON_SIZE, SHIP_OVERLAY_ICON_TOTAL_REMOTE_POS)
+
 
 	def draw_commander_overlay(self, mouse_pos):
 		for ranking, cmdr in enumerate(self.players):
@@ -157,9 +207,124 @@ class Game():
 				s_role_rect = s_role_surf.get_rect()
 				s_role_rect.left, s_role_rect.top = SHIP_OVERLAY_ROLE_POS
 				self.screen.blit(s_role_surf, s_role_rect)
-				
-				
-				
+
+				for i, a in enumerate(self.pool.ship_dict[s].abilities):
+					self.screen.blit(self.ship_overlay_ability_surfs[a], SHIP_OVERLAY_ABILITY_ICONS_RECT[i])
+
+				s_abilities_surf = self.ship_overlay_font_small.render('Abilities', AA, WHITE)
+				s_abilities_rect = s_abilities_surf.get_rect()
+				s_abilities_rect.center = SHIP_OVERLAY_ABILITY_TEXT_POS
+				s_abilities_rect.left = SHIP_OVERLAY_ABILITY_TEXT_POS[0]
+				self.screen.blit(s_abilities_surf, s_abilities_rect)
+
+				self.draw_hexagon(SHIP_OVERLAY_TIER_POS, 20, YELLOW)
+				self.draw_hexagon(SHIP_OVERLAY_TIER_POS, 24, YELLOW)
+				s_tier_surf = self.ship_overlay_font_small.render(str(self.pool.ship_dict[s].tier), AA, YELLOW)
+				s_tier_rect = s_tier_surf.get_rect()
+				s_tier_rect.center = SHIP_OVERLAY_TIER_POS
+				self.screen.blit(s_tier_surf, s_tier_rect)
+
+				self.screen.blit(self.ship_overlay_weapon_surfs[self.pool.ship_dict[s].weapon_type], self.ship_overlay_weapon_type_rect)
+				self.screen.blit(self.ship_overlay_drones_surf, self.ship_overlay_drones_rect)
+				self.screen.blit(self.ship_overlay_total_dps_surf, self.ship_overlay_total_dps_rect)
+				self.screen.blit(self.ship_overlay_volley_surf, self.ship_overlay_volley_rect)
+				self.screen.blit(self.ship_overlay_salvo_period_surf, self.ship_overlay_salvo_period_rect)
+				self.screen.blit(self.ship_overlay_shield_surf, self.ship_overlay_shield_rect)
+				self.screen.blit(self.ship_overlay_armor_surf, self.ship_overlay_armor_rect)
+				self.screen.blit(self.ship_overlay_hull_surf, self.ship_overlay_hull_rect)
+				self.screen.blit(self.ship_overlay_total_hp_surf, self.ship_overlay_total_hp_rect)
+				self.screen.blit(self.ship_overlay_shield_recharge_surf, self.ship_overlay_shield_recharge_rect)
+				self.screen.blit(self.ship_overlay_armor_recharge_surf, self.ship_overlay_armor_recharge_rect)
+				self.screen.blit(self.ship_overlay_total_recharge_surf, self.ship_overlay_total_recharge_rect)
+				self.screen.blit(self.ship_overlay_remote_shield_surf, self.ship_overlay_remote_shield_rect)
+				self.screen.blit(self.ship_overlay_remote_armor_surf, self.ship_overlay_remote_armor_rect)
+				self.screen.blit(self.ship_overlay_total_remote_surf, self.ship_overlay_total_remote_rect)
+				s_weapon_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].weapon_dps) + ' dps', AA, WHITE)
+				s_weapon_text_rect = s_weapon_text_surf.get_rect()
+				s_weapon_text_rect.center = SHIP_OVERLAY_ICON_WEAPON_TEXT_POS
+				s_weapon_text_rect.right = SHIP_OVERLAY_ICON_WEAPON_TEXT_POS[0]
+				self.screen.blit(s_weapon_text_surf, s_weapon_text_rect)
+				s_drones_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].drone_dps) + ' dps', AA, WHITE)
+				s_drones_text_rect = s_drones_text_surf.get_rect()
+				s_drones_text_rect.center = SHIP_OVERLAY_ICON_DRONES_TEXT_POS
+				s_drones_text_rect.right = SHIP_OVERLAY_ICON_DRONES_TEXT_POS[0]
+				self.screen.blit(s_drones_text_surf, s_drones_text_rect)
+				s_total_dps_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].total_dps) + ' dps', AA, WHITE)
+				s_total_dps_text_rect = s_total_dps_text_surf.get_rect()
+				s_total_dps_text_rect.center = SHIP_OVERLAY_ICON_TOTAL_DPS_TEXT_POS
+				s_total_dps_text_rect.right = SHIP_OVERLAY_ICON_TOTAL_DPS_TEXT_POS[0]
+				self.screen.blit(s_total_dps_text_surf, s_total_dps_text_rect)
+				s_volley_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].volley), AA, WHITE)
+				s_volley_text_rect = s_volley_text_surf.get_rect()
+				s_volley_text_rect.center = SHIP_OVERLAY_ICON_VOLLEY_TEXT_POS
+				s_volley_text_rect.right = SHIP_OVERLAY_ICON_VOLLEY_TEXT_POS[0]
+				self.screen.blit(s_volley_text_surf, s_volley_text_rect)
+				s_salvo_period_text_surf = self.ship_overlay_font_mini.render(format(self.pool.ship_dict[s].salvo_period, '.1f') + ' s', AA, WHITE)
+				s_salvo_period_text_rect = s_salvo_period_text_surf.get_rect()
+				s_salvo_period_text_rect.center = SHIP_OVERLAY_ICON_SALVO_PERIOD_TEXT_POS
+				s_salvo_period_text_rect.right = SHIP_OVERLAY_ICON_SALVO_PERIOD_TEXT_POS[0]
+				self.screen.blit(s_salvo_period_text_surf, s_salvo_period_text_rect)
+				s_shield_text_surf = self.ship_overlay_font_mini.render(f'{int(self.pool.ship_dict[s].shield_k * 1000):,}' + ' ehp', AA, WHITE)
+				s_shield_text_rect = s_shield_text_surf.get_rect()
+				s_shield_text_rect.center = SHIP_OVERLAY_ICON_SHIELD_TEXT_POS
+				s_shield_text_rect.right = SHIP_OVERLAY_ICON_SHIELD_TEXT_POS[0]
+				self.screen.blit(s_shield_text_surf, s_shield_text_rect)
+				s_armor_text_surf = self.ship_overlay_font_mini.render(f'{int(self.pool.ship_dict[s].armor_k * 1000):,}' + ' ehp', AA, WHITE)
+				s_armor_text_rect = s_armor_text_surf.get_rect()
+				s_armor_text_rect.center = SHIP_OVERLAY_ICON_ARMOR_TEXT_POS
+				s_armor_text_rect.right = SHIP_OVERLAY_ICON_ARMOR_TEXT_POS[0]
+				self.screen.blit(s_armor_text_surf, s_armor_text_rect)
+				s_hull_text_surf = self.ship_overlay_font_mini.render(f'{int(self.pool.ship_dict[s].hull_k * 1000):,}' + ' ehp', AA, WHITE)
+				s_hull_text_rect = s_hull_text_surf.get_rect()
+				s_hull_text_rect.center = SHIP_OVERLAY_ICON_HULL_TEXT_POS
+				s_hull_text_rect.right = SHIP_OVERLAY_ICON_HULL_TEXT_POS[0]
+				self.screen.blit(s_hull_text_surf, s_hull_text_rect)
+				s_total_hp_text_surf = self.ship_overlay_font_mini.render(f'{int(self.pool.ship_dict[s].total_hp * 1000):,}' + ' ehp', AA, WHITE)
+				s_total_hp_text_rect = s_total_hp_text_surf.get_rect()
+				s_total_hp_text_rect.center = SHIP_OVERLAY_ICON_TOTAL_HP_TEXT_POS
+				s_total_hp_text_rect.right = SHIP_OVERLAY_ICON_TOTAL_HP_TEXT_POS[0]
+				self.screen.blit(s_total_hp_text_surf, s_total_hp_text_rect)
+				s_shield_recharge_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].shield_recharge) + ' ehp/s', AA, WHITE)
+				s_shield_recharge_text_rect = s_shield_recharge_text_surf.get_rect()
+				s_shield_recharge_text_rect.center = SHIP_OVERLAY_ICON_SHIELD_RECHARGE_TEXT_POS
+				s_shield_recharge_text_rect.right = SHIP_OVERLAY_ICON_SHIELD_RECHARGE_TEXT_POS[0]
+				self.screen.blit(s_shield_recharge_text_surf, s_shield_recharge_text_rect)
+				s_armor_recharge_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].armor_recharge) + ' ehp/s', AA, WHITE)
+				s_armor_recharge_text_rect = s_armor_recharge_text_surf.get_rect()
+				s_armor_recharge_text_rect.center = SHIP_OVERLAY_ICON_ARMOR_RECHARGE_TEXT_POS
+				s_armor_recharge_text_rect.right = SHIP_OVERLAY_ICON_ARMOR_RECHARGE_TEXT_POS[0]
+				self.screen.blit(s_armor_recharge_text_surf, s_armor_recharge_text_rect)
+				s_total_recharge_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].total_recharge) + ' ehp/s', AA, WHITE)
+				s_total_recharge_text_rect = s_total_recharge_text_surf.get_rect()
+				s_total_recharge_text_rect.center = SHIP_OVERLAY_ICON_TOTAL_RECHARGE_TEXT_POS
+				s_total_recharge_text_rect.right = SHIP_OVERLAY_ICON_TOTAL_RECHARGE_TEXT_POS[0]
+				self.screen.blit(s_total_recharge_text_surf, s_total_recharge_text_rect)
+				s_remote_shield_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].remote_shield_rep) + ' ehp/s', AA, WHITE)
+				s_remote_shield_text_rect = s_remote_shield_text_surf.get_rect()
+				s_remote_shield_text_rect.center = SHIP_OVERLAY_ICON_REMOTE_SHIELD_TEXT_POS
+				s_remote_shield_text_rect.right = SHIP_OVERLAY_ICON_REMOTE_SHIELD_TEXT_POS[0]
+				self.screen.blit(s_remote_shield_text_surf, s_remote_shield_text_rect)
+				s_remote_armor_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].remote_armor_rep) + ' ehp/s', AA, WHITE)
+				s_remote_armor_text_rect = s_remote_armor_text_surf.get_rect()
+				s_remote_armor_text_rect.center = SHIP_OVERLAY_ICON_REMOTE_ARMOR_TEXT_POS
+				s_remote_armor_text_rect.right = SHIP_OVERLAY_ICON_REMOTE_ARMOR_TEXT_POS[0]
+				self.screen.blit(s_remote_armor_text_surf, s_remote_armor_text_rect)
+				s_total_remote_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].total_remote_rep) + ' ehp/s', AA, WHITE)
+				s_total_remote_text_rect = s_total_remote_text_surf.get_rect()
+				s_total_remote_text_rect.center = SHIP_OVERLAY_ICON_TOTAL_REMOTE_TEXT_POS
+				s_total_remote_text_rect.right = SHIP_OVERLAY_ICON_TOTAL_REMOTE_TEXT_POS[0]
+				self.screen.blit(s_total_remote_text_surf, s_total_remote_text_rect)
+				s_recharge_rate_text_surf = self.ship_overlay_font_mini.render('RECHARGE RATES', AA, WHITE)
+				s_recharge_rate_text_rect = s_recharge_rate_text_surf.get_rect()
+				s_recharge_rate_text_rect.center = SHIP_OVERLAY_RECHARGE_RATE_TEXT_POS
+				self.screen.blit(s_recharge_rate_text_surf, s_recharge_rate_text_rect)
+				s_remote_rep_text_surf = self.ship_overlay_font_mini.render('REMOTE REPAIR', AA, WHITE)
+				s_remote_rep_text_rect = s_remote_rep_text_surf.get_rect()
+				s_remote_rep_text_rect.center = SHIP_OVERLAY_REMOTE_REP_TEXT_POS
+				self.screen.blit(s_remote_rep_text_surf, s_remote_rep_text_rect)
+
+
+
 
 	def find_next_opponent(self):
 		self.next_opponent = random.choice(self.opponents)
@@ -199,7 +364,7 @@ class Game():
 			r.center = BATTLE_HEXAGON_POS_PLAYER_1[i]
 			self.screen.blit(s, r)
 
-	def draw_hexagon(self, pos, color=TEAL):
+	def draw_hexagon(self, pos, radius=BATTLE_HEXAGON_RADIUS, color=TEAL):
 		x = pos[0]
 		y = pos[1]
 		pygame.draw.aalines(
@@ -207,7 +372,7 @@ class Game():
 			color,
 			True,
 			[
-		        (x + BATTLE_HEXAGON_RADIUS * math.cos(2 * math.pi * i / 6), y + BATTLE_HEXAGON_RADIUS * math.sin(2 * math.pi * i / 6))
+		        (x + radius * math.cos(2 * math.pi * i / 6), y + radius * math.sin(2 * math.pi * i / 6))
 		        for i in range(6)
     		],
     		1
