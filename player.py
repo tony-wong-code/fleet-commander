@@ -40,6 +40,8 @@ class Player():
 		self.tier = 0
 		self.ships_in_market = []
 		self.hold_ships = False
+		self.upgrade_cost = UPGRADE_COST[self.tier]
+		self.plex = STARTING_PLEX
 
 	def print_ships(self):
 		print(self.ships)
