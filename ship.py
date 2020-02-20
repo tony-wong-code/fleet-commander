@@ -27,6 +27,9 @@ class Ship(pygame.sprite.Sprite):
 		self.armor_k = ship_info['armor_k']
 		self.hull_k = ship_info['hull_k']
 		self.total_hp = ship_info['total_hp']
+		self.shield = self.shield_k * 1000
+		self.armor = self.armor_k * 1000
+		self.hull = self.hull_k * 1000
 		self.shield_recharge = ship_info['shield_recharge']
 		self.armor_recharge = ship_info['armor_recharge']
 		self.total_recharge = ship_info['total_recharge']
@@ -45,6 +48,15 @@ class Ship(pygame.sprite.Sprite):
 		self.warp_fields = ship_info['warp_fields']
 		self.evasion = ship_info['evasion']
 		self.ship_score = ship_info['ship_score']
+		self.is_alive = True
+
+		self.battle_stats = [
+			[self.volley, int(self.salvo_period*10), self.weapon_type, self.drone_dps*MECHANIC_DRONE_CYCLE_TIME],
+			[self.shield, self.armor, self.hull],
+			[self.shield_recharge*MECHANIC_SHIELD_CYCLE_TIME, self.armor_recharge*MECHANIC_ARMOR_CYCLE_TIME],
+			[self.remote_shield_rep*MECHANIC_SHIELD_CYCLE_TIME, self.remote_armor_rep*MECHANIC_ARMOR_CYCLE_TIME],
+			[self.neuts, self.auras, self.webs_scrams, self.cap_transfers, self.sensor_boosters, self.track_guide_disrupts, self.ecm, self.damps, self.painters, self.warp_fields]
+		]
 
 		self.abilities = []
 		if self.auras != 0:

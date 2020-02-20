@@ -214,9 +214,18 @@ class Game():
 		self.ai_fitting_text_rect = self.ai_fitting_text_surf.get_rect()
 		self.ai_fitting_text_rect.center = AI_FITTING_TEXT_POS
 
+		self.cmdr_icon_rect_1 = pygame.Rect((0, 0), BATTLE_PLAYER_COMMANDER_ICON_SIZE)
+		self.cmdr_icon_rect_1.center = BATTLE_PLAYER_COMMANDER_ICON_POS_1
+		self.cmdr_icon_rect_2 = pygame.Rect((0, 0), BATTLE_PLAYER_COMMANDER_ICON_SIZE)
+		self.cmdr_icon_rect_2.center = BATTLE_PLAYER_COMMANDER_ICON_POS_2
+
+		self.battle_tick = 0
+
 	def draw_commander_overlay(self, mouse_pos):
 		for ranking, cmdr in enumerate(self.players):
-			if cmdr.rect.collidepoint(mouse_pos):
+			if (cmdr.rect.collidepoint(mouse_pos) and self.render_state == MARKET) \
+						or (cmdr.who == self.commander and self.cmdr_icon_rect_1.collidepoint(mouse_pos)and self.render_state == FLEET_BATTLE) \
+						or (cmdr.who == self.next_opponent and self.cmdr_icon_rect_2.collidepoint(mouse_pos) and self.render_state == FLEET_BATTLE):
 				bg_rect = pygame.Rect((0, 0), COMMANDER_OVERLAY_SIZE)
 				bg_rect.center = COMMANDER_OVERLAY_POS
 				bg_surf = pygame.Surface(COMMANDER_OVERLAY_SIZE)
@@ -741,17 +750,122 @@ class Game():
 
 
 		self.draw_battle_status(self.you, opp)
-
 		self.draw_ship_overlay(mouse_pos)
+		self.draw_commander_overlay(mouse_pos)
+
+		self.battle_tick = self.battle_step(self.you, opp, self.battle_tick)
+		if self.battle_tick == RESULT_DRAW:
+			print('draw')
+			sys.exit(0)
+		elif self.battle_tick == RESULT_P2_WIN:
+			print('p2 wins')
+			sys.exit(0)
+		elif self.battle_tick == RESULT_P1_WIN:
+			print('p1 wins')
+			sys.exit(0)
+
 		pygame.display.flip()
 		self.clock.tick(30)
 		return GAME
 
+	def battle_step(self, p1, p2, t, delay=100):
+		p1_ships = []
+		for i, s in enumerate(p1.ships):
+			if s != None:
+				sd = self.pool.ship_dict[s]
+				if sd.battle_stats[M_TANK][M_HULL] >= 1:
+					p1_ships.append(s)
+		p2_ships = []
+		for i, s in enumerate(p2.ships):
+			if s != None:
+				sd = self.pool.ship_dict[s]
+				if sd.battle_stats[M_TANK][M_HULL] >= 1:
+					p2_ships.append(s)
+		if len(p1_ships) == 0 and len(p2_ships) == 0:
+			return RESULT_DRAW
+		if len(p1_ships) == 0:
+			return RESULT_P2_WIN
+		if len(p2_ships) == 0:
+			return RESULT_P1_WIN
+
+		dead_ships = []
+		p1_target_list = p2_ships[:]
+		p2_target_list = p1_ships[:]
+
+		for s in p1.ships:
+			if len(p1_target_list) > 0:
+				if s != None:
+					sd = self.pool.ship_dict[s]
+					if sd.is_alive:
+						target = self.pool.ship_dict[random.choice(p1_target_list)]
+						print(str(sd.ship_id) + ' attacking ' + str(target.ship_id))
+						if t % MECHANIC_ARMOR_CYCLE_TIME == 0:
+							sd.battle_stats[M_TANK][M_SHIELD] = min(sd.shield, sd.battle_stats[M_TANK][M_SHIELD] + sd.shield_recharge)
+						if t % MECHANIC_SHIELD_CYCLE_TIME == 0:
+							sd.battle_stats[M_TANK][M_ARMOR] = min(sd.armor, sd.battle_stats[M_TANK][M_ARMOR] + sd.armor_recharge)
+						if t % MECHANIC_DRONE_CYCLE_TIME == 0 and sd.battle_stats[M_WEAPON][M_DRONE] > 0:
+							res = self.deal_damage(target, sd.battle_stats[M_WEAPON][M_DRONE])
+							if res != -1:
+								dead_ships.append(res)
+								p1_target_list.remove(res)
+						if (target.ship_id in p1_target_list) and sd.battle_stats[M_WEAPON][M_WEAPON] > 0 and (t % sd.battle_stats[M_WEAPON][M_SALVO] == 0):
+							res = self.deal_damage(target, sd.battle_stats[M_WEAPON][M_WEAPON])
+							if res != -1:
+								dead_ships.append(res)
+								p1_target_list.remove(res)
+
+		for s in p2.ships:
+			if len(p2_target_list) > 0:
+				if s != None:
+					sd = self.pool.ship_dict[s]
+					if sd.is_alive:
+						target = self.pool.ship_dict[random.choice(p2_target_list)]
+						print(str(sd.ship_id) + ' attacking ' + str(target.ship_id))
+						print(t)
+						if t % MECHANIC_ARMOR_CYCLE_TIME == 0:
+							sd.battle_stats[M_TANK][M_SHIELD] = min(sd.shield, sd.battle_stats[M_TANK][M_SHIELD] + sd.shield_recharge)
+						if t % MECHANIC_SHIELD_CYCLE_TIME == 0:
+							sd.battle_stats[M_TANK][M_ARMOR] = min(sd.armor, sd.battle_stats[M_TANK][M_ARMOR] + sd.armor_recharge)
+						if t % MECHANIC_DRONE_CYCLE_TIME == 0 and sd.battle_stats[M_WEAPON][M_DRONE] > 0:
+							res = self.deal_damage(target, sd.battle_stats[M_WEAPON][M_DRONE])
+							if res != -1:
+								dead_ships.append(res)
+								p2_target_list.remove(res)
+						if (target.ship_id in p2_target_list) and sd.battle_stats[M_WEAPON][M_WEAPON] > 0 and (t % sd.battle_stats[M_WEAPON][M_SALVO] == 0):
+							res = self.deal_damage(target, sd.battle_stats[M_WEAPON][M_WEAPON])
+							if res != -1:
+								dead_ships.append(res)
+								p2_target_list.remove(res)
+
+		for s in dead_ships:
+			self.pool.ship_dict[s].is_alive = False
+
+
+		pygame.time.wait(delay)
+		return t + 1
+
+	def deal_damage(self, target, dmg):
+		rem = 0
+		if target.battle_stats[M_TANK][M_SHIELD] > 0:
+			rem = abs(min(target.battle_stats[M_TANK][M_SHIELD] - dmg, 0))
+			target.battle_stats[M_TANK][M_SHIELD] = max(0, target.battle_stats[M_TANK][M_SHIELD] - dmg)
+			print(str(target.ship_id) + ' receives ' + str(dmg - rem) + ' shield damage')
+			dmg = rem
+		if dmg > 0 and target.battle_stats[M_TANK][M_ARMOR] > 0:
+			rem = abs(min(target.battle_stats[M_TANK][M_ARMOR] - dmg, 0))
+			target.battle_stats[M_TANK][M_ARMOR] = max(0, target.battle_stats[M_TANK][M_ARMOR] - dmg)
+			print(str(target.ship_id) + ' receives ' + str(dmg - rem) + ' armor damage')
+			dmg = rem
+		if dmg > 0 and target.battle_stats[M_TANK][M_HULL] > 0:
+			target.battle_stats[M_TANK][M_HULL] = max(0, target.battle_stats[M_TANK][M_HULL] - dmg)
+			print(str(target.ship_id) + ' receives ' + str(dmg - rem) + ' hull damage')
+		if target.battle_stats[M_TANK][M_HULL] == 0:
+			return target.ship_id
+		return -1
+
 	def draw_battle_status(self, p1, p2):
 		cmdr_icon_surf_1 = self.commander_dict[p1.who].battle_surf
-		cmdr_icon_rect_1 = self.commander_dict[p1.who].battle_rect
-		cmdr_icon_rect_1.center = BATTLE_PLAYER_COMMANDER_ICON_POS_1
-		self.screen.blit(cmdr_icon_surf_1, cmdr_icon_rect_1)
+		self.screen.blit(cmdr_icon_surf_1, self.cmdr_icon_rect_1)
 		cmdr_hp_surf_1, cmdr_hp_rect_1 = load_png('station_hp.png', BATTLE_PLAYER_COMMANDER_HP_ICON_SIZE, BATTLE_PLAYER_COMMANDER_HP_ICON_POS_1)
 		self.screen.blit(cmdr_hp_surf_1, cmdr_hp_rect_1)
 		cmdr_tier_surf_1, cmdr_tier_rect_1 = load_png(BATTLE_TIER_PATH[p1.tier], BATTLE_PLAYER_COMMANDER_TIER_SIZE, BATTLE_PLAYER_COMMANDER_TIER_POS_1)
@@ -791,11 +905,29 @@ class Game():
 				r.center = BATTLE_PLAYER_SHIP_HULL_POS_1[i]
 				r.left = BATTLE_PLAYER_SHIP_HULL_POS_1[i][0]
 				self.screen.blit(sf, r)
+				sd = self.pool.ship_dict[s]
+				r = pygame.Rect((0, 0), (int(BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[0]*(min(1.0, sd.battle_stats[M_TANK][M_SHIELD]/sd.shield*1.0))), BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[1]))
+				r.center = BATTLE_PLAYER_SHIP_SHIELD_POS_1[i]
+				r.left = BATTLE_PLAYER_SHIP_SHIELD_POS_1[i][0]
+				sf = pygame.Surface(r.size)
+				sf.fill(LIGHT_GRAY)
+				self.screen.blit(sf, r)
+				r = pygame.Rect((0, 0), (int(BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[0]*(min(1.0, sd.battle_stats[M_TANK][M_ARMOR]/sd.armor*1.0))), BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[1]))
+				r.center = BATTLE_PLAYER_SHIP_ARMOR_POS_1[i]
+				r.left = BATTLE_PLAYER_SHIP_ARMOR_POS_1[i][0]
+				sf = pygame.Surface(r.size)
+				sf.fill(LIGHT_GRAY)
+				self.screen.blit(sf, r)
+				r = pygame.Rect((0, 0), (int(BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[0]*(min(1.0, sd.battle_stats[M_TANK][M_HULL]/sd.hull*1.0))), BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[1]))
+				r.center = BATTLE_PLAYER_SHIP_HULL_POS_1[i]
+				r.left = BATTLE_PLAYER_SHIP_HULL_POS_1[i][0]
+				sf = pygame.Surface(r.size)
+				sf.fill(LIGHT_GRAY)
+				self.screen.blit(sf, r)
+
 
 		cmdr_icon_surf_2 = self.commander_dict[p2.who].battle_surf
-		cmdr_icon_rect_2 = self.commander_dict[p2.who].battle_rect
-		cmdr_icon_rect_2.center = BATTLE_PLAYER_COMMANDER_ICON_POS_2
-		self.screen.blit(cmdr_icon_surf_2, cmdr_icon_rect_2)
+		self.screen.blit(cmdr_icon_surf_2, self.cmdr_icon_rect_2)
 		cmdr_hp_surf_2, cmdr_hp_rect_2 = load_png('station_hp.png', BATTLE_PLAYER_COMMANDER_HP_ICON_SIZE, BATTLE_PLAYER_COMMANDER_HP_ICON_POS_2)
 		self.screen.blit(cmdr_hp_surf_2, cmdr_hp_rect_2)
 		cmdr_tier_surf_2, cmdr_tier_rect_2 = load_png(BATTLE_TIER_PATH[p2.tier], BATTLE_PLAYER_COMMANDER_TIER_SIZE, BATTLE_PLAYER_COMMANDER_TIER_POS_2)
@@ -834,6 +966,25 @@ class Game():
 				self.screen.blit(sf, r)
 				r.center = BATTLE_PLAYER_SHIP_HULL_POS_2[i]
 				r.left = BATTLE_PLAYER_SHIP_HULL_POS_2[i][0]
+				self.screen.blit(sf, r)
+				sd = self.pool.ship_dict[s]
+				r = pygame.Rect((0, 0), (int(BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[0]*(min(1.0, sd.battle_stats[M_TANK][M_SHIELD]/sd.shield))), BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[1]))
+				r.center = BATTLE_PLAYER_SHIP_SHIELD_POS_2[i]
+				r.left = BATTLE_PLAYER_SHIP_SHIELD_POS_2[i][0]
+				sf = pygame.Surface(r.size)
+				sf.fill(LIGHT_GRAY)
+				self.screen.blit(sf, r)
+				r = pygame.Rect((0, 0), (int(BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[0]*(min(1.0, sd.battle_stats[M_TANK][M_ARMOR]/sd.armor))), BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[1]))
+				r.center = BATTLE_PLAYER_SHIP_ARMOR_POS_2[i]
+				r.left = BATTLE_PLAYER_SHIP_ARMOR_POS_2[i][0]
+				sf = pygame.Surface(r.size)
+				sf.fill(LIGHT_GRAY)
+				self.screen.blit(sf, r)
+				r = pygame.Rect((0, 0), (int(BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[0]*(min(1.0, sd.battle_stats[M_TANK][M_HULL]/sd.hull))), BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE[1]))
+				r.center = BATTLE_PLAYER_SHIP_HULL_POS_2[i]
+				r.left = BATTLE_PLAYER_SHIP_HULL_POS_2[i][0]
+				sf = pygame.Surface(r.size)
+				sf.fill(LIGHT_GRAY)
 				self.screen.blit(sf, r)
 
 	def render_commander_select(self):
@@ -874,6 +1025,13 @@ class Game():
 		self.clock.tick(30)
 		return GAME
 
+	def set_ships_alive(self):
+		for p in self.players:
+			for s in p.ships:
+				if s != None:
+					self.pool.ship_dict[s].is_alive = True
+
+
 	def render_ai_fitting(self):
 		s = pygame.Surface(RESOLUTION)
 		s.fill(GRAY)
@@ -893,6 +1051,8 @@ class Game():
 			if p != self.you:
 				self.fit_ai(p)
 		self.render_state = FLEET_BATTLE
+		self.set_ships_alive()
+		self.battle_tick = 1
 
 		pygame.display.flip()
 		self.clock.tick(30)
