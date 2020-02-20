@@ -51,7 +51,7 @@ class Ship(pygame.sprite.Sprite):
 		self.is_alive = True
 
 		self.battle_stats = [
-			[self.volley, int(self.salvo_period*10), self.weapon_type, self.drone_dps*MECHANIC_DRONE_CYCLE_TIME],
+			[self.volley, int(self.salvo_period), self.weapon_type, self.drone_dps*MECHANIC_DRONE_CYCLE_TIME],
 			[self.shield, self.armor, self.hull],
 			[self.shield_recharge*MECHANIC_SHIELD_CYCLE_TIME, self.armor_recharge*MECHANIC_ARMOR_CYCLE_TIME],
 			[self.remote_shield_rep*MECHANIC_SHIELD_CYCLE_TIME, self.remote_armor_rep*MECHANIC_ARMOR_CYCLE_TIME],

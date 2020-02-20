@@ -748,27 +748,31 @@ class Game():
 				self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_2[N_SHIPS_PER_PLAYER - i - 1], color=RED)
 				self.screen.blit(self.pool.ship_dict[opp.ships[i]].icon_surf, r)
 
+		self.battle_tick = self.battle_step(self.you, opp, self.battle_tick, 300)
 
 		self.draw_battle_status(self.you, opp)
 		self.draw_ship_overlay(mouse_pos)
 		self.draw_commander_overlay(mouse_pos)
 
-		self.battle_tick = self.battle_step(self.you, opp, self.battle_tick)
+		
 		if self.battle_tick == RESULT_DRAW:
 			print('draw')
+			pygame.time.delay(10000)
 			sys.exit(0)
 		elif self.battle_tick == RESULT_P2_WIN:
 			print('p2 wins')
+			pygame.time.delay(10000)
 			sys.exit(0)
 		elif self.battle_tick == RESULT_P1_WIN:
 			print('p1 wins')
+			pygame.time.delay(10000)
 			sys.exit(0)
 
 		pygame.display.flip()
 		self.clock.tick(30)
 		return GAME
 
-	def battle_step(self, p1, p2, t, delay=100):
+	def battle_step(self, p1, p2, t, delay=1000):
 		p1_ships = []
 		for i, s in enumerate(p1.ships):
 			if s != None:
@@ -809,6 +813,7 @@ class Game():
 								dead_ships.append(res)
 								p1_target_list.remove(res)
 						if (target.ship_id in p1_target_list) and sd.battle_stats[M_WEAPON][M_WEAPON] > 0 and (t % sd.battle_stats[M_WEAPON][M_SALVO] == 0):
+							print(str(t) + ":" + str(sd.battle_stats[M_WEAPON][M_SALVO]))
 							res = self.deal_damage(target, sd.battle_stats[M_WEAPON][M_WEAPON])
 							if res != -1:
 								dead_ships.append(res)
@@ -832,6 +837,7 @@ class Game():
 								dead_ships.append(res)
 								p2_target_list.remove(res)
 						if (target.ship_id in p2_target_list) and sd.battle_stats[M_WEAPON][M_WEAPON] > 0 and (t % sd.battle_stats[M_WEAPON][M_SALVO] == 0):
+							print(str(t) + ":" + str(sd.battle_stats[M_WEAPON][M_SALVO]))
 							res = self.deal_damage(target, sd.battle_stats[M_WEAPON][M_WEAPON])
 							if res != -1:
 								dead_ships.append(res)
@@ -858,7 +864,7 @@ class Game():
 			dmg = rem
 		if dmg > 0 and target.battle_stats[M_TANK][M_HULL] > 0:
 			target.battle_stats[M_TANK][M_HULL] = max(0, target.battle_stats[M_TANK][M_HULL] - dmg)
-			print(str(target.ship_id) + ' receives ' + str(dmg - rem) + ' hull damage')
+			print(str(target.ship_id) + ' receives ' + str(dmg) + ' hull damage')
 		if target.battle_stats[M_TANK][M_HULL] == 0:
 			return target.ship_id
 		return -1

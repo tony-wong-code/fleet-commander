@@ -1,28 +1,34 @@
-# fleet-commander
+# Fleet Commander
+#### An autobattler based on the space sandbox Eve Online. Pick your commander, build your fleet, and destroy the enemy's station!
+---
+
+##### AlgoExpert Winter 2020 SWE Contest Submission
+
+##### Tested on Python 3.8.1 and pygame 1.9.6
+
+`py fleet_commander.py`
 
 TO-DO
 =====
 * start screen
-  * start button
-  * link to youtube tutorial
-* bloodline selection
-* battle generator
-* battle animations for player
-* score screen
+  * stats
+  * tutorial
+* battle
+  * commander perks
+  * ship abilities
+  * remote repping
+* commanders
+  * buffs and nerfs
+* ai-battle
+* subsequent market phases
+* end screen
 
-* caldari
-  * civire - ruthless aggression
-  * deteis - sharp, ordered, strategic thinkers
-  * archura - mysterious, reclusive, and spiritual
-* gallente
-  * intaki - gifted communicators and artists
-  * gallente - self-righteous defenders of the free-world
-  * jin-mei - generally carefree except when dealing with their caste system
-* amarr
-  * true amarr - arrogant, proud, with a great sense of tradition
-  * ni-kunni - hardworking merchants and skilled negotiators
-  * khanid - best infantry, warrior tradition
-* minmatar
-  * brutor - keenly aware of their surroundings, passionate individuals
-  * sebiestor - most innovative thinkers
-  * vherokior - shrewd business acumen
+---
+
+#### Special thanks to the following tools:
+[EVE_NT Ship Editor](https://eve-nt.uk/designer/)
+[Pixelator](http://pixelatorapp.com/)
+[Pyfa](https://github.com/pyfa-org/Pyfa/releases)
+[Eve Online Developer Resources](https://developers.eveonline.com/resource/resources)
+[Character Inspiration](https://www.pinterest.com/eveonline/stunning-eve-online-characters/)
+[Background Inspiration](http://getwallpapers.com/collection/eve-online-wallpaper-1920x1080)
