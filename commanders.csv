@@ -1,13 +1,13 @@
-name,race,bloodline,image,bonus,penalty
-Alice Saki,Minmatar,Sebiestor,commanders/AliceSaki.png,placeholder bonus,placeholder penalty
-Axium Cog,Gallente,Gallente,commanders/AxiumCog.png,+20% attack for Gallente and Minmatar ships,-20% attack for Amarr and Caldari ships
-Carcosa Hali,Caldari,Achura,commanders/CarcosaHali.png,placeholder bonus,placeholder penalty
-Courdorecqe en Faan,Gallente,Intaki,commanders/CourdorecqeEnFaan.png,placeholder bonus,placeholder penalty
-Elena Melkan,Minmatar,Sebiestor,commanders/ElenaMelkan.png,placeholder bonus,placeholder penalty
-Ila Gant,Amarr,Ni-Kunni,commanders/IlaGant.png,placeholder bonus,placeholder penalty
-Leonova Klystra,Caldari,Deteis,commanders/LeonovaKlystra.png,placeholder bonus,placeholder penalty
-Noriko Satomi,Gallente,Jin-Mei,commanders/NorikoSatomi.png,placeholder bonus,placeholder penalty
-Ob Komad,Amarr,Khanid,commanders/ObKomad.png,placeholder bonus,placeholder penalty
-Ris Dnalor,Minmatar,Sebiestor,commanders/RisDnalor.png,placeholder bonus,placeholder penalty
-Shizuken,Caldari,Achura,commanders/Shizuken.png,placeholder bonus,placeholder penalty
-The Old Chap,Amarr,Amarr,commanders/TheOldChap.png,+30% attack for Amarr ships,-30% attack for non-Amarr ships
+name,race,bloodline,image,bonus,penalty,quick_upgrade_chance,slow_upgrade_chance
+Alice Saki,Minmatar,Sebiestor,commanders/AliceSaki.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Axium Cog,Gallente,Gallente,commanders/AxiumCog.png,+20% attack for Gallente and Minmatar ships,-20% attack for Amarr and Caldari ships,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Carcosa Hali,Caldari,Achura,commanders/CarcosaHali.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Courdorecqe en Faan,Gallente,Intaki,commanders/CourdorecqeEnFaan.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Elena Melkan,Minmatar,Sebiestor,commanders/ElenaMelkan.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Ila Gant,Amarr,Ni-Kunni,commanders/IlaGant.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Leonova Klystra,Caldari,Deteis,commanders/LeonovaKlystra.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Noriko Satomi,Gallente,Jin-Mei,commanders/NorikoSatomi.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Ob Komad,Amarr,Khanid,commanders/ObKomad.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Ris Dnalor,Minmatar,Sebiestor,commanders/RisDnalor.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+Shizuken,Caldari,Achura,commanders/Shizuken.png,placeholder bonus,placeholder penalty,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"
+The Old Chap,Amarr,Amarr,commanders/TheOldChap.png,+30% attack for Amarr ships,-30% attack for non-Amarr ships,"0.9,0.1,0.1,0.1,0.1","0.9,0.8,0.5,0.4,0.4"

@@ -21,3 +21,6 @@ class Commander(pygame.sprite.Sprite):
 		self.commander_overlay_rect.center = COMMANDER_OVERLAY_ICON_POS
 		self.bonus_description = commander_info['bonus']
 		self.penalty_description = commander_info['penalty']
+		self.quick_upgrade_chance = list(commander_info['quick_upgrade_chance'].split(','))
+		self.slow_upgrade_chance = list(commander_info['slow_upgrade_chance'].split(','))
+		self.battle_surf, self.battle_rect = load_png(commander_info['image'], BATTLE_PLAYER_COMMANDER_ICON_SIZE)

@@ -20,7 +20,7 @@ class Pool():
 		i = 0
 		for s in ships:
 			for j in range(N_SHIP_COPIES_PER_TIER[s['tier']]):
-				self.ship_dict[i+j] = Ship(s)
+				self.ship_dict[i+j] = Ship(s, i+j)
 				self.available[s['tier']].add(i+j)
 			i += N_SHIP_COPIES_PER_TIER[s['tier']]
 		for t in range(1, N_TIERS):

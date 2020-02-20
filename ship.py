@@ -9,8 +9,9 @@ except(ImportError, err):
     sys.exit(2)
 
 class Ship(pygame.sprite.Sprite):
-	def __init__(self, ship_info):
+	def __init__(self, ship_info, ship_id):
 		super(Ship, self).__init__()
+		self.ship_id = ship_id
 		self.name = ship_info['name']
 		self.race = ship_info['race']
 		self.size = ship_info['size']

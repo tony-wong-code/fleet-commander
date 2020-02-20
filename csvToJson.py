@@ -71,6 +71,8 @@ with open(path) as csvFile:
 		commander['image'] = row['image']
 		commander['bonus'] = row['bonus']
 		commander['penalty'] = row['penalty']
+		commander['quick_upgrade_chance'] = row['quick_upgrade_chance']
+		commander['slow_upgrade_chance'] = row['slow_upgrade_chance']
 		data['commanders'].append(commander)
 
 with open(jsonFileName, 'w') as jsonFile:

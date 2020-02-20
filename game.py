@@ -94,6 +94,7 @@ class Game():
 		self.refresh_button_icon_rect.center = MARKET_BUTTON_LEFT_ICON_POS_1
 		self.hold_button_icon_surf, self.hold_button_icon_rect = load_png('overlay_icons/hold.png', MARKET_BUTTON_ICON_SIZE)
 		self.hold_button_icon_rect.center = MARKET_BUTTON_LEFT_ICON_POS_2
+		self.hold_button_icon_surf_2, self.hold_button_icon_rect_2 = load_png('overlay_icons/hold.png', HOLD_ICON_SIZE)
 		self.salvage_button_icon_surf, self.salvage_button_icon_rect = load_png('overlay_icons/salvage.png', MARKET_BUTTON_ICON_SIZE)
 		self.salvage_button_icon_rect.center = MARKET_BUTTON_LEFT_ICON_POS_3
 		self.plex_icon_surf, self.tmp_rect = load_png('overlay_icons/plex.png', MARKET_BUTTON_ICON_2_SIZE)
@@ -106,6 +107,16 @@ class Game():
 		self.market_plex_surf, self.market_plex_rect = load_png('overlay_icons/plex.png', MARKET_PLEX_ICON_SIZE)
 		self.market_plex_rect.center = MARKET_PLEX_ICON_POS
 
+		self.enter_battle_rect = pygame.Rect((0, 0), ENTER_BATTLE_RECT_SIZE)
+		self.enter_battle_rect.center = ENTER_BATTLE_RECT_POS
+		self.enter_battle_surf = pygame.Surface(ENTER_BATTLE_RECT_SIZE)
+		self.enter_battle_surf.fill(GRAY)
+		self.enter_battle_surf.set_alpha(200)
+		self.enter_battle_text_surf = self.font_mini.render('Warp to Battle', AA, WHITE)
+		self.enter_battle_text_rect = self.enter_battle_text_surf.get_rect()
+		self.enter_battle_text_rect.center = ENTER_BATTLE_TEXT_POS
+		self.enter_battle_icon_surf, self.enter_battle_icon_rect = load_png('overlay_icons/battle.png', ENTER_BATTLE_ICON_SIZE)
+		self.enter_battle_icon_rect.center = ENTER_BATTLE_ICON_POS
 
 
 
@@ -195,7 +206,13 @@ class Game():
 
 		self.ship_selection = None
 		self.ship_escrow = None
+		self.ship_swap_index = None
 
+		# AI fitting screen
+		self.ai_fitting_icon_surf, self.ai_fitting_icon_rect = load_png('ai.png', AI_FITTING_ICON_SIZE, AI_FITTING_ICON_POS)
+		self.ai_fitting_text_surf = self.font_medium.render('Opponents are selecting ships...', AA, WHITE)
+		self.ai_fitting_text_rect = self.ai_fitting_text_surf.get_rect()
+		self.ai_fitting_text_rect.center = AI_FITTING_TEXT_POS
 
 	def draw_commander_overlay(self, mouse_pos):
 		for ranking, cmdr in enumerate(self.players):
@@ -245,6 +262,10 @@ class Game():
 		for s in self.you.ships:
 			if s is not None and self.pool.ship_dict[s].icon_rect.collidepoint(mouse_pos):
 				self.draw_ship_overlay_helper(s)
+		if self.render_state == FLEET_BATTLE:
+			for s in self.players_dict[self.next_opponent].ships:
+				if s is not None and self.pool.ship_dict[s].icon_rect.collidepoint(mouse_pos):
+					self.draw_ship_overlay_helper(s)
 
 	def draw_ship_overlay_helper(self, s):
 		bg_rect = pygame.Rect((0, 0), SHIP_OVERLAY_SIZE)
@@ -306,22 +327,22 @@ class Game():
 		self.screen.blit(self.ship_overlay_remote_armor_surf, self.ship_overlay_remote_armor_rect)
 		self.screen.blit(self.ship_overlay_total_remote_surf, self.ship_overlay_total_remote_rect)
 		self.screen.blit(self.ship_overlay_evasion_surf, self.ship_overlay_evasion_rect)
-		s_weapon_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].weapon_dps) + ' dps', AA, WHITE)
+		s_weapon_text_surf = self.ship_overlay_font_mini.render(f'{self.pool.ship_dict[s].weapon_dps:,}' + ' dps', AA, WHITE)
 		s_weapon_text_rect = s_weapon_text_surf.get_rect()
 		s_weapon_text_rect.center = SHIP_OVERLAY_ICON_WEAPON_TEXT_POS
 		s_weapon_text_rect.right = SHIP_OVERLAY_ICON_WEAPON_TEXT_POS[0]
 		self.screen.blit(s_weapon_text_surf, s_weapon_text_rect)
-		s_drones_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].drone_dps) + ' dps', AA, WHITE)
+		s_drones_text_surf = self.ship_overlay_font_mini.render(f'{self.pool.ship_dict[s].drone_dps:,}' + ' dps', AA, WHITE)
 		s_drones_text_rect = s_drones_text_surf.get_rect()
 		s_drones_text_rect.center = SHIP_OVERLAY_ICON_DRONES_TEXT_POS
 		s_drones_text_rect.right = SHIP_OVERLAY_ICON_DRONES_TEXT_POS[0]
 		self.screen.blit(s_drones_text_surf, s_drones_text_rect)
-		s_total_dps_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].total_dps) + ' dps', AA, WHITE)
+		s_total_dps_text_surf = self.ship_overlay_font_mini.render(f'{self.pool.ship_dict[s].total_dps:,}' + ' dps', AA, WHITE)
 		s_total_dps_text_rect = s_total_dps_text_surf.get_rect()
 		s_total_dps_text_rect.center = SHIP_OVERLAY_ICON_TOTAL_DPS_TEXT_POS
 		s_total_dps_text_rect.right = SHIP_OVERLAY_ICON_TOTAL_DPS_TEXT_POS[0]
 		self.screen.blit(s_total_dps_text_surf, s_total_dps_text_rect)
-		s_volley_text_surf = self.ship_overlay_font_mini.render(str(self.pool.ship_dict[s].volley), AA, WHITE)
+		s_volley_text_surf = self.ship_overlay_font_mini.render(f'{self.pool.ship_dict[s].volley:,}', AA, WHITE)
 		s_volley_text_rect = s_volley_text_surf.get_rect()
 		s_volley_text_rect.center = SHIP_OVERLAY_ICON_VOLLEY_TEXT_POS
 		s_volley_text_rect.right = SHIP_OVERLAY_ICON_VOLLEY_TEXT_POS[0]
@@ -395,9 +416,114 @@ class Game():
 		s_evasion_text_rect.right = SHIP_OVERLAY_ABILITY_ICONS_POS[7][0]
 		self.screen.blit(s_evasion_text_surf, s_evasion_text_rect)
 
+	def roll_ships(self, plyr):
+		plyr.plex = max(0, plyr.plex + ROLL_COST)
+		for i, s in enumerate(plyr.ships_in_market):
+			if s != None:
+				self.pool.return_ship(s)
+				plyr.ships_in_market[i] = None
+		for i, s in enumerate(plyr.ships_in_market):
+			s = self.pool.get_ship(plyr.tier)
+			plyr.ships_in_market[i] = s
+			self.pool.remove_ship(s)
+
+	def refill_ships(self, plyr):
+		if not plyr.hold_ships:
+			for i, s in enumerate(plyr.ships_in_market):
+				if s != None:
+					self.pool.return_ship(s)
+					plyr.ships_in_market[i] = None
+		plyr.hold_ships = False
+		for i, s in enumerate(plyr.ships_in_market):
+			if s == None:
+				self.pool.get_ship(plyr.tier)
+				plyr.ships_in_market[i] = s
+				self.pool.remove_ship(s)
+
+
+	def upgrade_tier(self, plyr):
+		if plyr.tier < N_TIERS - 1:
+			plyr.plex = max(0, plyr.plex + plyr.upgrade_cost)
+			plyr.tier = min(N_TIERS - 1, plyr.tier + 1)
+			plyr.upgrade_cost = UPGRADE_COST[plyr.tier]
+			n_ship_slots = N_MARKET_SHIPS_PER_TIER[plyr.tier] - N_MARKET_SHIPS_PER_TIER[plyr.tier - 1]
+			for _ in range(n_ship_slots):
+				plyr.ships_in_market.append(None)
+
+	def salvage_ship(self, plyr, ship_index):
+		plyr.plex = min(MAX_PLEX, plyr.plex + SALVAGE_CREDIT)
+		self.pool.return_ship(plyr.ships[ship_index])
+		plyr.ships[ship_index] = None
+		plyr.salvaging = False
+
+	def swap_ships(self, plyr, i, j):
+		plyr.ships[i], plyr.ships[j] = plyr.ships[j], plyr.ships[i]
+		if plyr == self.you:
+			if plyr.ships[i] != None:
+				self.pool.ship_dict[plyr.ships[i]].icon_rect.center = BATTLE_HEXAGON_POS_PLAYER_1[i]
+			if plyr.ships[j] != None:
+				self.pool.ship_dict[plyr.ships[j]].icon_rect.center = BATTLE_HEXAGON_POS_PLAYER_1[j]
 
 	def find_next_opponent(self):
 		self.next_opponent = random.choice(self.opponents)
+
+	def fit_ai(self, plyr):
+		ship_bag = []
+		for i in range(N_MARKET_SHIPS_PER_TIER[plyr.tier]):
+			ship_bag.append(self.pool.get_ship(plyr.tier))
+		if (plyr.tier < N_TIERS - 1):
+			if (plyr.plex >= abs(plyr.upgrade_cost)):
+				if (random.randrange(0, 100)/100) < self.commander_dict[plyr.who].quick_upgrade_chance:
+					plyr.plex + plyr.upgrade_cost
+					plyr.tier = min(N_TIERS - 1, plyr.tier + 1)
+					plyr.upgrade_cost = UPGRADE_COST[plyr.tier]
+			if (plyr.plex + SHIP_COST >= abs(plyr.upgrade_cost)):
+				if (random.randrange(0, 100)/100) < self.commander_dict[plyr.who].slow_upgrade_chance:
+					plyr.plex + plyr.upgrade_cost
+					plyr.tier = min(N_TIERS - 1, plyr.tier + 1)
+					plyr.upgrade_cost = UPGRADE_COST[plyr.tier]
+		n_new_ships = plyr.plex // abs(SHIP_COST)
+		if n_new_ships > 0:
+			n_rolls = plyr.plex % abs(ROLL_COST)
+			for i in range(N_MARKET_SHIPS_PER_TIER[plyr.tier] * n_rolls):
+				ship_bag.append(self.pool.get_ship(plyr.tier))
+			ships = []
+			for s in ship_bag:
+				ships.append(self.pool.ship_dict[s])
+			ships.sort(key=operator.attrgetter('ship_score'))
+			
+			### pick best ships
+			current_ships = []
+			for s in plyr.ships:
+				if s != None:
+					current_ships.append(self.pool.ship_dict[s])
+			ship_candidates = []
+			for _ in range(n_new_ships):
+				ship_candidates.append(ships.pop())
+			for s in ship_candidates:
+				ship_bag.remove(s.ship_id)
+			if len(current_ships) + len(ship_candidates) > N_SHIPS_PER_PLAYER:
+				current_ships.extend(ship_candidates)
+				current_ships.sort(key=operator.attrgetter('ship_score'), reverse=True)
+				while len(current_ships) > N_SHIPS_PER_PLAYER:
+					s = current_ships.pop()
+					for i, ship in enumerate(plyr.ships):
+						if ship != None and s.ship_id == ship:
+							plyr.ships[i] = None
+							self.pool.return_ship(s.ship_id)
+							continue
+			for i, ship in enumerate(plyr.ships):
+				if len(ship_candidates) > 0 and ship == None:
+					s = ship_candidates.pop()
+					plyr.ships[i] = s.ship_id
+
+			###
+		for s in ship_bag:
+			self.pool.return_ship(s)
+		plyr.plex = 0
+
+
+
 
 	def init_players(self):
 		plyrs = random.sample(self.available_commanders, 7)
@@ -416,7 +542,9 @@ class Game():
 			self.you.ships_in_market = []
 		self.you.hold_ships = False
 		while len(self.you.ships_in_market) < N_MARKET_SHIPS_PER_TIER[self.you.tier]:
-			self.you.ships_in_market.append(self.pool.get_ship(self.you.tier))
+			s = self.pool.get_ship(self.you.tier)
+			self.you.ships_in_market.append(s)
+			self.pool.remove_ship(s)
 
 	def draw_upgrade_button(self):
 		if self.you.tier < N_TIERS - 1:
@@ -448,7 +576,7 @@ class Game():
 		rect.center = MARKET_BUTTON_RIGHT_TEXT_1
 		rect.right = MARKET_BUTTON_RIGHT_TEXT_1[0]
 		self.screen.blit(surf, rect)
-		if self.you.plex < abs(ROLL_COST):
+		if self.you.plex < abs(ROLL_COST) or self.you.hold_ships:
 			self.screen.blit(self.refresh_button_surf, self.refresh_button_rect)
 
 	def draw_hold_button(self):
@@ -477,11 +605,17 @@ class Game():
 		if len([_ for _ in self.you.ships if _ is not None]) == 0:
 			self.screen.blit(self.salvage_button_surf, self.salvage_button_rect)
 
+	def draw_enter_battle_button(self):
+		self.screen.blit(self.enter_battle_surf, self.enter_battle_rect)
+		self.screen.blit(self.enter_battle_text_surf, self.enter_battle_text_rect)
+		self.screen.blit(self.enter_battle_icon_surf, self.enter_battle_icon_rect)
+
 	def draw_market(self, mouse_pos):
 		self.draw_upgrade_button()
 		self.draw_refresh_button()
 		self.draw_hold_button()
 		self.draw_salvage_button()
+		self.draw_enter_battle_button()
 		self.screen.blit(self.market_plex_surf, self.market_plex_rect)
 		surf = self.font_medium.render(str(self.you.plex) + '/' + str(MAX_PLEX), AA, ORANGE)
 		rect = surf.get_rect()
@@ -497,17 +631,27 @@ class Game():
 				r = self.pool.ship_dict[s].icon_rect
 				r.center = ((i + 1)*MARKET_SHIP_ICON_PADDING + int((i + 0.5)*MARKET_SHIP_ICON_SIZE[0]) + MARKET_SHIP_ICON_OFFSET[self.you.tier], RESOLUTION[1]//4)
 				self.screen.blit(self.pool.ship_dict[s].icon_surf, r)
+				if self.you.hold_ships:
+					self.hold_button_icon_rect_2.center = r.center
+					self.screen.blit(self.hold_button_icon_surf_2, self.hold_button_icon_rect_2)
 		for i in range(N_SHIPS_PER_PLAYER):
 			if self.ship_escrow != None and self.you.ships[i] == None:
 				self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i], color=YELLOW)
 			else:
-				self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i])
+				if self.you.salvaging:
+					self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i], color=GRAY)
+				else:
+					self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i])
 			s = self.commander_font_medium.render(str(i + 1), AA, WHITE)
 			r = s.get_rect()
 			r.center = BATTLE_HEXAGON_POS_PLAYER_1[i]
 			self.screen.blit(s, r)
 			if self.you.ships[i] != None:
 				self.screen.blit(self.pool.ship_dict[self.you.ships[i]].icon_surf, self.pool.ship_dict[self.you.ships[i]].icon_rect)
+			if self.you.ships[i] != None and self.you.salvaging:
+				self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i], color=PURPLE)
+			if self.ship_swap_index != None and i != self.ship_swap_index:
+				self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i], color=YELLOW)
 
 	def draw_hexagon(self, pos, radius=BATTLE_HEXAGON_RADIUS, color=TEAL):
 		x = pos[0]
@@ -557,8 +701,140 @@ class Game():
 			return self.render_market()
 		elif self.render_state == BATTLE:
 			return self.render_battle()
+		elif self.render_state == AI_FITTING:
+			return self.render_ai_fitting()
+		elif self.render_state == FLEET_BATTLE:
+			return self.render_fleet_battle()
 		else:
 			sys.exit(2)
+
+	def render_fleet_battle(self):
+		self.screen.blit(self.battle_bg_surf, self.battle_bg_rect)
+		opp = self.players_dict[self.next_opponent]
+		mouse_pos = pygame.mouse.get_pos()
+
+		for event in pygame.event.get():
+			if event.type == KEYDOWN:
+				if event.key == K_ESCAPE:
+					sys.exit(0)
+			elif event.type == QUIT:
+				sys.exit(0)
+
+		for i in range(N_SHIPS_PER_PLAYER):
+			s = self.commander_font_medium.render(str(i + 1), AA, WHITE)
+			r = s.get_rect()
+			r.center = BATTLE_HEXAGON_POS_PLAYER_1[i]
+			self.screen.blit(s, r)
+			r.center = BATTLE_HEXAGON_POS_PLAYER_2[N_SHIPS_PER_PLAYER - i - 1]
+			self.screen.blit(s, r)
+
+			self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i], color=GRAY)
+			self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_2[N_SHIPS_PER_PLAYER - i - 1], color=GRAY)
+			if self.you.ships[i] != None:
+				self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_1[i], color=GREEN)
+				self.screen.blit(self.pool.ship_dict[self.you.ships[i]].icon_surf, self.pool.ship_dict[self.you.ships[i]].icon_rect)
+			if opp.ships[i] != None:
+				r = self.pool.ship_dict[opp.ships[i]].icon_rect
+				r.center = BATTLE_HEXAGON_POS_PLAYER_2[N_SHIPS_PER_PLAYER - i - 1]
+				self.draw_hexagon(BATTLE_HEXAGON_POS_PLAYER_2[N_SHIPS_PER_PLAYER - i - 1], color=RED)
+				self.screen.blit(self.pool.ship_dict[opp.ships[i]].icon_surf, r)
+
+
+		self.draw_battle_status(self.you, opp)
+
+		self.draw_ship_overlay(mouse_pos)
+		pygame.display.flip()
+		self.clock.tick(30)
+		return GAME
+
+	def draw_battle_status(self, p1, p2):
+		cmdr_icon_surf_1 = self.commander_dict[p1.who].battle_surf
+		cmdr_icon_rect_1 = self.commander_dict[p1.who].battle_rect
+		cmdr_icon_rect_1.center = BATTLE_PLAYER_COMMANDER_ICON_POS_1
+		self.screen.blit(cmdr_icon_surf_1, cmdr_icon_rect_1)
+		cmdr_hp_surf_1, cmdr_hp_rect_1 = load_png('station_hp.png', BATTLE_PLAYER_COMMANDER_HP_ICON_SIZE, BATTLE_PLAYER_COMMANDER_HP_ICON_POS_1)
+		self.screen.blit(cmdr_hp_surf_1, cmdr_hp_rect_1)
+		cmdr_tier_surf_1, cmdr_tier_rect_1 = load_png(BATTLE_TIER_PATH[p1.tier], BATTLE_PLAYER_COMMANDER_TIER_SIZE, BATTLE_PLAYER_COMMANDER_TIER_POS_1)
+		self.screen.blit(cmdr_tier_surf_1, cmdr_tier_rect_1)
+		cmdr_hp_text_surf = self.font_mini.render(str(p1.station_health), AA, WHITE)
+		cmdr_hp_text_rect = cmdr_hp_text_surf.get_rect()
+		cmdr_hp_text_rect.center = BATTLE_PLAYER_COMMANDER_HP_ICON_POS_1
+		self.screen.blit(cmdr_hp_text_surf, cmdr_hp_text_rect)
+		r = pygame.Rect((0, 0), SHIP_OVERLAY_SMALL_ICON_SIZE)
+		r.center = BATTLE_PLAYER_SHIP_SHIELD_ICON_POS_1
+		self.screen.blit(self.ship_overlay_shield_surf, r)
+		r.center = BATTLE_PLAYER_SHIP_ARMOR_ICON_POS_1
+		self.screen.blit(self.ship_overlay_armor_surf, r)
+		r.center = BATTLE_PLAYER_SHIP_HULL_ICON_POS_1
+		self.screen.blit(self.ship_overlay_hull_surf, r)
+
+		for i, s in enumerate(p1.ships):
+			txt_str = str(i + 1) + '.  '
+			if s != None:
+				txt_str = ''.join([txt_str, self.pool.ship_dict[s].name])
+			txt_surf = self.font_mini.render(txt_str, AA, WHITE)
+			txt_rect = txt_surf.get_rect()
+			txt_rect.center = BATTLE_PLAYER_SHIP_TEXT_POS_1[i]
+			txt_rect.left = BATTLE_PLAYER_SHIP_TEXT_POS_1[i][0]
+			self.screen.blit(txt_surf, txt_rect)
+
+			if s != None:
+				r = pygame.Rect((0, 0), BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE)
+				r.center = BATTLE_PLAYER_SHIP_SHIELD_POS_1[i]
+				r.left = BATTLE_PLAYER_SHIP_SHIELD_POS_1[i][0]
+				sf = pygame.Surface(BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE)
+				sf.fill(RED)
+				self.screen.blit(sf, r)
+				r.center = BATTLE_PLAYER_SHIP_ARMOR_POS_1[i]
+				r.left = BATTLE_PLAYER_SHIP_ARMOR_POS_1[i][0]
+				self.screen.blit(sf, r)
+				r.center = BATTLE_PLAYER_SHIP_HULL_POS_1[i]
+				r.left = BATTLE_PLAYER_SHIP_HULL_POS_1[i][0]
+				self.screen.blit(sf, r)
+
+		cmdr_icon_surf_2 = self.commander_dict[p2.who].battle_surf
+		cmdr_icon_rect_2 = self.commander_dict[p2.who].battle_rect
+		cmdr_icon_rect_2.center = BATTLE_PLAYER_COMMANDER_ICON_POS_2
+		self.screen.blit(cmdr_icon_surf_2, cmdr_icon_rect_2)
+		cmdr_hp_surf_2, cmdr_hp_rect_2 = load_png('station_hp.png', BATTLE_PLAYER_COMMANDER_HP_ICON_SIZE, BATTLE_PLAYER_COMMANDER_HP_ICON_POS_2)
+		self.screen.blit(cmdr_hp_surf_2, cmdr_hp_rect_2)
+		cmdr_tier_surf_2, cmdr_tier_rect_2 = load_png(BATTLE_TIER_PATH[p2.tier], BATTLE_PLAYER_COMMANDER_TIER_SIZE, BATTLE_PLAYER_COMMANDER_TIER_POS_2)
+		self.screen.blit(cmdr_tier_surf_2, cmdr_tier_rect_2)
+		cmdr_hp_text_surf = self.font_mini.render(str(p2.station_health), AA, WHITE)
+		cmdr_hp_text_rect = cmdr_hp_text_surf.get_rect()
+		cmdr_hp_text_rect.center = BATTLE_PLAYER_COMMANDER_HP_ICON_POS_2
+		self.screen.blit(cmdr_hp_text_surf, cmdr_hp_text_rect)
+		r = pygame.Rect((0, 0), SHIP_OVERLAY_SMALL_ICON_SIZE)
+		r.center = BATTLE_PLAYER_SHIP_SHIELD_ICON_POS_2
+		self.screen.blit(self.ship_overlay_shield_surf, r)
+		r.center = BATTLE_PLAYER_SHIP_ARMOR_ICON_POS_2
+		self.screen.blit(self.ship_overlay_armor_surf, r)
+		r.center = BATTLE_PLAYER_SHIP_HULL_ICON_POS_2
+		self.screen.blit(self.ship_overlay_hull_surf, r)
+
+		for i, s in enumerate(p2.ships):
+			txt_str = str(i + 1) + '.  '
+			if s != None:
+				txt_str = ''.join([txt_str, self.pool.ship_dict[s].name])
+			txt_surf = self.font_mini.render(txt_str, AA, WHITE)
+			txt_rect = txt_surf.get_rect()
+			txt_rect.center = BATTLE_PLAYER_SHIP_TEXT_POS_2[i]
+			txt_rect.left = BATTLE_PLAYER_SHIP_TEXT_POS_2[i][0]
+			self.screen.blit(txt_surf, txt_rect)
+
+			if s != None:
+				r = pygame.Rect((0, 0), BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE)
+				r.center = BATTLE_PLAYER_SHIP_SHIELD_POS_2[i]
+				r.left = BATTLE_PLAYER_SHIP_SHIELD_POS_2[i][0]
+				sf = pygame.Surface(BATTLE_PLAYER_SHIP_STATUS_BAR_SIZE)
+				sf.fill(RED)
+				self.screen.blit(sf, r)
+				r.center = BATTLE_PLAYER_SHIP_ARMOR_POS_2[i]
+				r.left = BATTLE_PLAYER_SHIP_ARMOR_POS_2[i][0]
+				self.screen.blit(sf, r)
+				r.center = BATTLE_PLAYER_SHIP_HULL_POS_2[i]
+				r.left = BATTLE_PLAYER_SHIP_HULL_POS_2[i][0]
+				self.screen.blit(sf, r)
 
 	def render_commander_select(self):
 		mouse_pos = pygame.mouse.get_pos()
@@ -598,11 +874,51 @@ class Game():
 		self.clock.tick(30)
 		return GAME
 
+	def render_ai_fitting(self):
+		s = pygame.Surface(RESOLUTION)
+		s.fill(GRAY)
+		r = pygame.Rect((0, 0), RESOLUTION)
+		self.screen.blit(s, r)
+		self.screen.blit(self.ai_fitting_icon_surf, self.ai_fitting_icon_rect)
+		self.screen.blit(self.ai_fitting_text_surf, self.ai_fitting_text_rect)
+
+		for event in pygame.event.get():
+			if event.type == KEYDOWN:
+				if event.key == K_ESCAPE:
+					sys.exit(0)
+			elif event.type == QUIT:
+				sys.exit(0)
+
+		for p in self.players:
+			if p != self.you:
+				self.fit_ai(p)
+		self.render_state = FLEET_BATTLE
+
+		pygame.display.flip()
+		self.clock.tick(30)
+		return GAME
+
 	def render_market(self):
 		self.screen.blit(self.market_bg_surf, self.market_bg_rect)
+
+		r = pygame.Rect((0, 100), (len(self.you.ships_in_market)*(MARKET_SHIP_ICON_SIZE[0] + MARKET_SHIP_ICON_PADDING), 120))
+		r.center = (RESOLUTION[0]//2, RESOLUTION[1]//4)
+		s = pygame.Surface(r.size)
+		s.fill(BLACK)
+		s.set_alpha(100)
+		self.screen.blit(s, r)
+
 		mouse_pos = pygame.mouse.get_pos()
 		self.draw_player_ranking()
 		self.draw_market(mouse_pos)
+
+		if self.you.plex < abs(SHIP_COST):
+			r = pygame.Rect((0, 100), (len(self.you.ships_in_market)*(MARKET_SHIP_ICON_SIZE[0] + MARKET_SHIP_ICON_PADDING), 120))
+			r.center = (RESOLUTION[0]//2, RESOLUTION[1]//4)
+			s = pygame.Surface(r.size)
+			s.fill(GRAY)
+			s.set_alpha(150)
+			self.screen.blit(s, r)
 
 		self.draw_commander_overlay(mouse_pos)
 		self.draw_ship_overlay(mouse_pos)
@@ -611,25 +927,58 @@ class Game():
 			if event.type == KEYDOWN:
 				if event.key == K_ESCAPE:
 					sys.exit(0)
+
+				### DEBUG
+				if event.key == K_p:
+					self.you.plex = 100
+				###
+
 			elif event.type == MOUSEBUTTONDOWN:
 				if event.button == 1:
-					for i, s in enumerate(self.you.ships_in_market):
-						if s != None and self.pool.ship_dict[s].icon_rect.collidepoint(mouse_pos):
-							self.ship_selection = s
-							self.ship_selection_index = i
 					if self.ship_escrow != None:
 						for i, r in enumerate(BATTLE_HEXAGON_RECTS):
-							if r.collidepoint(mouse_pos):
+							if r.collidepoint(mouse_pos) and self.you.ships[i] == None and self.you.plex >= abs(SHIP_COST):
+								self.you.plex = max(0, self.you.plex + SHIP_COST)
 								self.you.ships[i] = self.ship_escrow
 								self.pool.ship_dict[self.ship_escrow].icon_rect.center = BATTLE_HEXAGON_POS_PLAYER_1[i]
 								self.you.ships_in_market[self.ship_selection_index] = None
 								self.ship_escrow = None
 								self.ship_selection_index = None
-			elif event.type == MOUSEBUTTONUP:
-				if event.button == 1:
-					if self.ship_selection != None and self.pool.ship_dict[self.ship_selection].icon_rect.collidepoint(mouse_pos):
-						self.ship_escrow = self.ship_selection
-						self.ship_selection = None
+								continue
+						self.ship_escrow = None
+					elif self.you.salvaging:
+						for i, r in enumerate(BATTLE_HEXAGON_RECTS):
+							if r.collidepoint(mouse_pos) and self.you.ships[i] != None:
+								self.salvage_ship(self.you, i)
+								continue
+						self.you.salvaging = False
+					elif self.ship_swap_index != None:
+						for i, r in enumerate(BATTLE_HEXAGON_RECTS):
+							if r.collidepoint(mouse_pos):
+								self.swap_ships(self.you, i, self.ship_swap_index)
+								continue
+						self.ship_swap_index = None
+					else:
+						if self.refresh_button_rect.collidepoint(mouse_pos) and self.you.plex >= abs(ROLL_COST) and not self.you.hold_ships:
+							self.roll_ships(self.you)
+						elif self.upgrade_button_rect.collidepoint(mouse_pos) and self.you.plex >= abs(self.you.upgrade_cost):
+							self.upgrade_tier(self.you)
+						elif self.hold_button_rect.collidepoint(mouse_pos):
+							self.you.hold_ships = not self.you.hold_ships
+						elif self.salvage_button_rect.collidepoint(mouse_pos):
+							self.you.salvaging = True
+						elif self.enter_battle_rect.collidepoint(mouse_pos):
+							self.render_state = AI_FITTING
+						else:
+							for i, r in enumerate(BATTLE_HEXAGON_RECTS):
+								if r.collidepoint(mouse_pos) and self.you.ships[i] != None:
+									self.ship_swap_index = i
+									continue
+							for i, s in enumerate(self.you.ships_in_market):
+								if s != None and self.pool.ship_dict[s].icon_rect.collidepoint(mouse_pos) and self.you.plex >= abs(SHIP_COST):
+									self.ship_escrow = s
+									self.ship_selection_index = i
+									continue
 			elif event.type == QUIT:
 				sys.exit(0)
 
