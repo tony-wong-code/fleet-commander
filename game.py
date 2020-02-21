@@ -41,6 +41,7 @@ class Game():
 		for i, choice in enumerate(self.choose_from_commanders):
 			self.commander_dict[choice].rect.center = COMMANDER_SELECT_ICON_POS[i]
 
+		self.font_big = pygame.font.Font(FONT, BIG_FONT_SIZE)
 		self.font_medium = pygame.font.Font(FONT, MEDIUM_FONT_SIZE)
 		self.font_small = pygame.font.Font(FONT, SMALL_FONT_SIZE)
 		self.font_mini = pygame.font.Font(FONT, MINI_FONT_SIZE)
@@ -213,6 +214,9 @@ class Game():
 		self.ai_fitting_text_surf = self.font_medium.render('Opponents are selecting ships...', AA, WHITE)
 		self.ai_fitting_text_rect = self.ai_fitting_text_surf.get_rect()
 		self.ai_fitting_text_rect.center = AI_FITTING_TEXT_POS
+		self.ai_battle_text_surf = self.font_medium.render('Computers are battling...', AA, WHITE)
+		self.ai_battle_text_rect = self.ai_battle_text_surf.get_rect()
+		self.ai_battle_text_rect.center = AI_FITTING_TEXT_POS
 
 		self.cmdr_icon_rect_1 = pygame.Rect((0, 0), BATTLE_PLAYER_COMMANDER_ICON_SIZE)
 		self.cmdr_icon_rect_1.center = BATTLE_PLAYER_COMMANDER_ICON_POS_1
@@ -220,6 +224,7 @@ class Game():
 		self.cmdr_icon_rect_2.center = BATTLE_PLAYER_COMMANDER_ICON_POS_2
 
 		self.battle_tick = 0
+		self.turn = 0
 
 	def draw_commander_overlay(self, mouse_pos):
 		for ranking, cmdr in enumerate(self.players):
@@ -482,12 +487,12 @@ class Game():
 			ship_bag.append(self.pool.get_ship(plyr.tier))
 		if (plyr.tier < N_TIERS - 1):
 			if (plyr.plex >= abs(plyr.upgrade_cost)):
-				if (random.randrange(0, 100)/100) < self.commander_dict[plyr.who].quick_upgrade_chance:
+				if (random.randrange(0, 100)/100) < self.commander_dict[plyr.who].quick_upgrade_chance[plyr.tier]:
 					plyr.plex + plyr.upgrade_cost
 					plyr.tier = min(N_TIERS - 1, plyr.tier + 1)
 					plyr.upgrade_cost = UPGRADE_COST[plyr.tier]
 			if (plyr.plex + SHIP_COST >= abs(plyr.upgrade_cost)):
-				if (random.randrange(0, 100)/100) < self.commander_dict[plyr.who].slow_upgrade_chance:
+				if (random.randrange(0, 100)/100) < self.commander_dict[plyr.who].slow_upgrade_chance[plyr.tier]:
 					plyr.plex + plyr.upgrade_cost
 					plyr.tier = min(N_TIERS - 1, plyr.tier + 1)
 					plyr.upgrade_cost = UPGRADE_COST[plyr.tier]
@@ -714,8 +719,116 @@ class Game():
 			return self.render_ai_fitting()
 		elif self.render_state == FLEET_BATTLE:
 			return self.render_fleet_battle()
+		elif self.render_state == AI_BATTLE:
+			return self.render_ai_battle()
+		elif self.render_state == LOSE_SCREEN:
+			return self.render_lose_screen()
+		elif self.render_state == WIN_SCREEN:
+			return self.render_win_screen()
 		else:
 			sys.exit(2)
+
+	def render_lose_screen(self):
+		s = pygame.Surface(RESOLUTION)
+		s.fill(GRAY)
+		r = pygame.Rect((0, 0), RESOLUTION)
+		self.screen.blit(s, r)
+		s = self.font_big.render('YOU LOSE', AA, WHITE)
+		r = s.get_rect()
+		r.center = (RESOLUTION[0]//2, RESOLUTION[1]//2)
+		self.screen.blit(s, r)
+		for event in pygame.event.get():
+			if event.type == KEYDOWN:
+				if event.key == K_ESCAPE:
+					sys.exit(0)
+			elif event.type == QUIT:
+				sys.exit(0)
+		return GAME
+
+	def render_win_screen(self):
+		s = pygame.Surface(RESOLUTION)
+		s.fill(GRAY)
+		r = pygame.Rect((0, 0), RESOLUTION)
+		self.screen.blit(s, r)
+		s = self.font_big.render('YOU WIN', AA, WHITE)
+		r = s.get_rect()
+		r.center = (RESOLUTION[0]//2, RESOLUTION[1]//2)
+		self.screen.blit(s, r)
+		for event in pygame.event.get():
+			if event.type == KEYDOWN:
+				if event.key == K_ESCAPE:
+					sys.exit(0)
+			elif event.type == QUIT:
+				sys.exit(0)
+		return GAME
+
+
+	def render_ai_battle(self):
+		#pygame.time.wait(3000)
+		s = pygame.Surface(RESOLUTION)
+		s.fill(GRAY)
+		r = pygame.Rect((0, 0), RESOLUTION)
+		self.screen.blit(s, r)
+		self.screen.blit(self.ai_fitting_icon_surf, self.ai_fitting_icon_rect)
+		self.screen.blit(self.ai_battle_text_surf, self.ai_battle_text_rect)
+
+		for event in pygame.event.get():
+			if event.type == KEYDOWN:
+				if event.key == K_ESCAPE:
+					sys.exit(0)
+			elif event.type == QUIT:
+				sys.exit(0)
+
+		ai_list = []
+		for p in self.players:
+			if p != self.you and p.who != self.next_opponent and p.is_alive:
+				ai_list.append(p.who)
+
+		pygame.display.flip()
+
+		battle_order = random.sample(ai_list, len(ai_list))
+
+		while len(battle_order) > 1:
+			p1 = self.players_dict[battle_order.pop()]
+			p2 = self.players_dict[battle_order.pop()]
+			self.battle_tick = 1
+			while self.battle_tick > 0:
+				self.battle_tick = self.battle_step(p1, p2, self.battle_tick, 0)
+			if self.battle_tick == RESULT_DRAW:
+				print(str(p1.who) + ' draws with ' + str(p2.who))
+			elif self.battle_tick == RESULT_P2_WIN:
+				d = self.calculate_player_dmg(p2, p1)
+				print('%s deals %d damage to %s' % (p2.who, d, p1.who))
+
+			elif self.battle_tick == RESULT_P1_WIN:
+				d = self.calculate_player_dmg(p1, p2)
+				print('%s deals %d damage to %s' % (p1.who, d, p2.who))
+
+
+
+
+		
+		self.clock.tick(30)
+
+		print('ai battle complete')
+		self.render_state = MARKET
+		self.turn += 1
+
+
+		if not self.you.is_alive:
+			self.render_state = LOSE_SCREEN
+		dead_ai = 0
+		for p in self.players:
+			if p.is_alive:
+				p.plex = min(MAX_PLEX, STARTING_PLEX + self.turn)
+			else:
+				dead_ai += 1
+		if dead_ai == 7:
+			self.render_state = WIN_SCREEN
+
+		self.init_player_market()
+		return GAME
+
 
 	def render_fleet_battle(self):
 		self.screen.blit(self.battle_bg_surf, self.battle_bg_rect)
@@ -749,28 +862,51 @@ class Game():
 				self.screen.blit(self.pool.ship_dict[opp.ships[i]].icon_surf, r)
 
 		self.battle_tick = self.battle_step(self.you, opp, self.battle_tick, 300)
+		if self.battle_tick < 0:
+			r = pygame.Rect((0, 0), (RESOLUTION[0]//2, 150))
+			r.center = (RESOLUTION[0]//2, RESOLUTION[1]//2)
+			s = pygame.Surface(r.size)
+			s.fill(GRAY)
+			s.set_alpha(200)
+			self.screen.blit(s, r)
+			t = self.font_small.render('', AA, WHITE)
+			if self.battle_tick == RESULT_DRAW:
+				t = self.font_medium.render('Draw', AA, WHITE)
+			elif self.battle_tick == RESULT_P2_WIN:
+				d = self.calculate_player_dmg(opp, self.you)
+				t = self.font_medium.render('Opponent deals %d damage to you' % d, AA, WHITE)
+			elif self.battle_tick == RESULT_P1_WIN:
+				d = self.calculate_player_dmg(self.you, opp)
+				t = self.font_medium.render('You deal %d damage to opponent' % d, AA, WHITE)
+			t_rect = t.get_rect()
+			t_rect.center = r.center
+			self.screen.blit(t, t_rect)
+			pygame.display.flip()
+			self.clock.tick(30)
+			self.render_state = AI_BATTLE
+			return GAME
 
 		self.draw_battle_status(self.you, opp)
 		self.draw_ship_overlay(mouse_pos)
 		self.draw_commander_overlay(mouse_pos)
 
 		
-		if self.battle_tick == RESULT_DRAW:
-			print('draw')
-			pygame.time.delay(10000)
-			sys.exit(0)
-		elif self.battle_tick == RESULT_P2_WIN:
-			print('p2 wins')
-			pygame.time.delay(10000)
-			sys.exit(0)
-		elif self.battle_tick == RESULT_P1_WIN:
-			print('p1 wins')
-			pygame.time.delay(10000)
-			sys.exit(0)
 
 		pygame.display.flip()
 		self.clock.tick(30)
 		return GAME
+
+	def calculate_player_dmg(self, p1, p2):
+		dmg = 0
+		for i, s in enumerate(p1.ships):
+			if s != None:
+				dmg += 1
+				dmg += self.pool.ship_dict[s].tier
+				dmg += p1.tier
+		p2.station_health = max(0, p2.station_health - dmg)
+		if p2.station_health <= 0:
+			p2.is_alive = False
+		return dmg
 
 	def battle_step(self, p1, p2, t, delay=1000):
 		p1_ships = []

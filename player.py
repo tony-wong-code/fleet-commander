@@ -25,3 +25,4 @@ class Player():
 		self.upgrade_cost = UPGRADE_COST[self.tier]
 		self.plex = STARTING_PLEX
 		self.salvaging = False
+		self.is_alive = True
