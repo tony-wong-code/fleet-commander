@@ -479,7 +479,11 @@ class Game():
 				self.pool.ship_dict[plyr.ships[j]].icon_rect.center = BATTLE_HEXAGON_POS_PLAYER_1[j]
 
 	def find_next_opponent(self):
-		self.next_opponent = random.choice(self.opponents)
+		opponents = []
+		for p in self.players:
+			if p.is_alive and p != self.you:
+				opponents.append(p.who)
+		self.next_opponent = random.choice(opponents)
 
 	def fit_ai(self, plyr):
 		ship_bag = []
@@ -487,12 +491,12 @@ class Game():
 			ship_bag.append(self.pool.get_ship(plyr.tier))
 		if (plyr.tier < N_TIERS - 1):
 			if (plyr.plex >= abs(plyr.upgrade_cost)):
-				if (random.randrange(0, 100)/100) < self.commander_dict[plyr.who].quick_upgrade_chance[plyr.tier]:
+				if (random.randrange(0, 100)/100) < float(self.commander_dict[plyr.who].quick_upgrade_chance[plyr.tier]):
 					plyr.plex + plyr.upgrade_cost
 					plyr.tier = min(N_TIERS - 1, plyr.tier + 1)
 					plyr.upgrade_cost = UPGRADE_COST[plyr.tier]
 			if (plyr.plex + SHIP_COST >= abs(plyr.upgrade_cost)):
-				if (random.randrange(0, 100)/100) < self.commander_dict[plyr.who].slow_upgrade_chance[plyr.tier]:
+				if (random.randrange(0, 100)/100) < float(self.commander_dict[plyr.who].slow_upgrade_chance[plyr.tier]):
 					plyr.plex + plyr.upgrade_cost
 					plyr.tier = min(N_TIERS - 1, plyr.tier + 1)
 					plyr.upgrade_cost = UPGRADE_COST[plyr.tier]
@@ -743,6 +747,7 @@ class Game():
 					sys.exit(0)
 			elif event.type == QUIT:
 				sys.exit(0)
+		pygame.display.flip()
 		return GAME
 
 	def render_win_screen(self):
@@ -760,6 +765,7 @@ class Game():
 					sys.exit(0)
 			elif event.type == QUIT:
 				sys.exit(0)
+		pygame.display.flip()
 		return GAME
 
 
@@ -817,16 +823,24 @@ class Game():
 
 		if not self.you.is_alive:
 			self.render_state = LOSE_SCREEN
+			return GAME
 		dead_ai = 0
 		for p in self.players:
 			if p.is_alive:
 				p.plex = min(MAX_PLEX, STARTING_PLEX + self.turn)
+				p.upgrade_cost = min(0, p.upgrade_cost + 1)
+				for s in p.ships:
+					if s != None:
+						self.pool.ship_dict[s].reset_battle_stats()
 			else:
 				dead_ai += 1
 		if dead_ai == 7:
 			self.render_state = WIN_SCREEN
+			return GAME
 
 		self.init_player_market()
+		self.players.sort(key=operator.attrgetter('station_health'), reverse=True)
+		self.find_next_opponent()
 		return GAME
 
 

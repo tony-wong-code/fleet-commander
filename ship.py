@@ -83,3 +83,13 @@ class Ship(pygame.sprite.Sprite):
 		self.image_path = 'ships/' + self.name.lower() + '.png'
 		self.icon_surf, self.icon_rect = load_png(self.image_path, SHIP_ICON_SIZE)
 		self.overlay_surf, self.overlay_rect = load_png(self.image_path, SHIP_ICON_OVERLAY_SIZE)
+
+	def reset_battle_stats(self):
+		self.battle_stats = [
+			[self.volley, int(self.salvo_period), self.weapon_type, self.drone_dps*MECHANIC_DRONE_CYCLE_TIME],
+			[self.shield, self.armor, self.hull],
+			[self.shield_recharge*MECHANIC_SHIELD_CYCLE_TIME, self.armor_recharge*MECHANIC_ARMOR_CYCLE_TIME],
+			[self.remote_shield_rep*MECHANIC_SHIELD_CYCLE_TIME, self.remote_armor_rep*MECHANIC_ARMOR_CYCLE_TIME],
+			[self.neuts, self.auras, self.webs_scrams, self.cap_transfers, self.sensor_boosters, self.track_guide_disrupts, self.ecm, self.damps, self.painters, self.warp_fields]
+		]
+

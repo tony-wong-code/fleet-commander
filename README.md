@@ -6,6 +6,8 @@
 
 ##### Tested on Python 3.8.1 and pygame 1.9.6
 
+### NOTE! this game takes about 15 seconds to load due to the image files for all 120+ ships (will be optimized later)
+
 `py fleet_commander.py`
 
 TO-DO
@@ -19,9 +21,6 @@ TO-DO
   * remote repping
 * commanders
   * buffs and nerfs
-* ai-battle
-* subsequent market phases
-* end screen
 
 ---
 
