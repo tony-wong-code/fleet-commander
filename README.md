@@ -10,17 +10,10 @@
 
 `py fleet_commander.py`
 
-TO-DO
+Notes:
 =====
-* start screen
-  * stats
-  * tutorial
-* battle
-  * commander perks
-  * ship abilities
-  * remote repping
-* commanders
-  * buffs and nerfs
+* Game is playable but left in the state of its contest submission.
+  * The purpose was to get it playable without fruitlessly spending too much time on optimizations.
 
 ---
 
